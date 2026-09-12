@@ -79,17 +79,17 @@ def rewrite_data_paths(path: Path) -> bool:
     # Template expressions such as ${regionId} are preserved inside the
     # resulting template literal.
     text = re.sub(
-        r"'\/data\/([^'\\n]*)'",
+        r"'/data/([^'\n]*)'",
         lambda m: f"dataPath('{m.group(1)}')",
         text,
     )
     text = re.sub(
-        r'"\/data\/([^"\\n]*)"',
+        r'"/data/([^"\n]*)"',
         lambda m: f'dataPath("{m.group(1)}")',
         text,
     )
     text = re.sub(
-        r"`\/data\/([^`]*)`",
+        r"`/data/([^`]*)`",
         lambda m: f"dataPath(`{m.group(1)}`)",
         text,
     )
@@ -106,7 +106,7 @@ def rewrite_data_paths(path: Path) -> bool:
 
 
 def validate() -> None:
-    root_data_literal = re.compile(r"['\"`]\/data\/")
+    root_data_literal = re.compile(r"['\"`]/data/")
     leftovers: list[str] = []
     for path in sorted(SRC.rglob("*")):
         if path.suffix not in {".js", ".jsx"}:
