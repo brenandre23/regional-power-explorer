@@ -1,3 +1,4 @@
+import { dataPath } from './paths';
 /**
  * Base map layers, built on the World Bank Official Boundaries extract that
  * tools/prepare_boundaries.py writes into public/data.
@@ -48,7 +49,7 @@ async function fetchJson(path) {
  * @param {'10m'|'110m'} resolution
  */
 export async function fetchCountries(resolution = '10m') {
-  const fc = await fetchJson(`/data/countries_${resolution}.geojson`);
+  const fc = await fetchJson(dataPath(`countries_${resolution}.geojson`));
   fc.features.forEach((f, i) => { f.id = i; });
   return fc;
 }
@@ -67,7 +68,7 @@ export function addCountriesSource(map, countries) {
  * @param {'10m'|'110m'} resolution
  */
 export async function fetchBoundaries(resolution = '10m') {
-  return fetchJson(`/data/boundaries_${resolution}.geojson`);
+  return fetchJson(dataPath(`boundaries_${resolution}.geojson`));
 }
 
 /**

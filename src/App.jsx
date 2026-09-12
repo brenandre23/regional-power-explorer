@@ -1,3 +1,4 @@
+import { routerBasename } from './utils/paths';
 import { createContext, useContext, useState } from 'react';
 import { THEME_LIST } from './constants';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -23,7 +24,7 @@ export default function App() {
 
   return (
     <ThemeCtx.Provider value={{ theme, setTheme }}>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBasename}>
         <div style={{
           display: 'flex', flexDirection: 'column', height: '100vh',
           overflow: 'hidden', backgroundColor: t.bg,

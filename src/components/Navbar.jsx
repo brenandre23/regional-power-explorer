@@ -1,3 +1,4 @@
+import { dataPath } from '../utils/paths';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../App';
 import { getT, THEME_LIST, THEMES } from '../constants';
@@ -14,7 +15,7 @@ function useEpmRegions() {
   const [epm, setEpm] = useState(null);
 
   useEffect(() => {
-    fetch('/data/regions.json')
+    fetch(dataPath('regions.json'))
       .then(r => r.json())
       .then(d => {
         const all = (d.regions || []).filter(r => r.type !== 'meta');
@@ -40,7 +41,7 @@ function useBreadcrumb() {
     const parts = location.pathname.split('/').filter(Boolean);
     if (parts.length === 0) { setCrumb(null); return; }
     if (parts[0] === 'region' && parts[1]) {
-      fetch('/data/regions.json')
+      fetch(dataPath('regions.json'))
         .then(r => r.json())
         .then(d => {
           const r = (d.regions || []).find(r => r.id === parts[1]);
@@ -48,7 +49,7 @@ function useBreadcrumb() {
         })
         .catch(() => setCrumb({ type: 'region', label: parts[1] }));
     } else if (parts[0] === 'country' && parts[1]) {
-      fetch('/data/regions.json')
+      fetch(dataPath('regions.json'))
         .then(r => r.json())
         .then(d => {
           for (const r of (d.regions || [])) {

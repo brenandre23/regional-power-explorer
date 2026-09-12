@@ -1,3 +1,4 @@
+import { dataPath } from '../utils/paths';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { track } from '../analytics';
@@ -174,18 +175,18 @@ export default function RegionPage() {
 
   // Static data
   useEffect(() => {
-    fetch('/data/tariffs.json').then(r => r.json()).then(setTariffs).catch(() => {});
-    fetch('/data/access.json').then(r => r.json()).then(setAccess).catch(() => {});
+    fetch(dataPath('tariffs.json')).then(r => r.json()).then(setTariffs).catch(() => {});
+    fetch(dataPath('access.json')).then(r => r.json()).then(setAccess).catch(() => {});
   }, []);
 
   // Region metadata + availability checks
   useEffect(() => {
-    fetch('/data/regions.json').then(r => r.json()).then(d => {
+    fetch(dataPath('regions.json')).then(r => r.json()).then(d => {
       const r = (d.regions || []).find(r => r.id === regionId);
       setRegion(r || null);
     });
     setCapacity(null); setFleetAge(null);
-    fetch(`/data/cache/region_capacity_${regionId}.json`).then(r => r.json()).then(setCapacity).catch(() => {});
+    fetch(dataPath(`cache/region_capacity_${regionId}.json`)).then(r => r.json()).then(setCapacity).catch(() => {});
     setFuelsOff(new Set()); setStatusOff(new Set()); setKvsOff(new Set());
     setLinesOn(true); setPlantsOn(true); setSubsOn(false);
     setLoadCentersOn(false); setLcMinPop(300_000); setLcCircleScale(1.0);
@@ -197,7 +198,7 @@ export default function RegionPage() {
     setCorrExistOn(false); setCorrCommOn(false); setCorrCandOn(false);
     setZoningConfigs([]); setSelectedSlug(null);
     setCountriesOff(new Set()); setPlantCount(null);
-    fetch(`/data/zones/${regionId}_configs.json`)
+    fetch(dataPath(`zones/${regionId}_configs.json`))
       .then(r => r.ok ? r.json() : null)
       .then(cfgs => {
         if (cfgs?.length) {
@@ -209,11 +210,11 @@ export default function RegionPage() {
       .catch(() => {});
 
     setGppdAvailable(null);
-    fetch(`/data/cache/region_plants_${regionId}_gppd.geojson`, { method: 'HEAD' })
+    fetch(dataPath(`cache/region_plants_${regionId}_gppd.geojson`), { method: 'HEAD' })
       .then(r => setGppdAvailable(r.ok)).catch(() => setGppdAvailable(false));
 
     setGemAvailable(null);
-    fetch(`/data/cache/region_plants_${regionId}_gem.geojson`, { method: 'HEAD' })
+    fetch(dataPath(`cache/region_plants_${regionId}_gem.geojson`), { method: 'HEAD' })
       .then(r => setGemAvailable(r.ok)).catch(() => setGemAvailable(false));
   }, [regionId]);
 
@@ -221,14 +222,14 @@ export default function RegionPage() {
   useEffect(() => {
     setFleetAge(null);
     if (plantSource !== 'gppd') return;
-    fetch(`/data/cache/region_age_${regionId}_gppd.json`)
+    fetch(dataPath(`cache/region_age_${regionId}_gppd.json`))
       .then(r => r.ok ? r.json() : null).then(setFleetAge).catch(() => {});
   }, [plantSource, regionId]);
 
   // Plant count for overview stats
   useEffect(() => {
     const suffix = plantSource === 'gppd' ? '_gppd' : plantSource === 'gem' ? '_gem' : '';
-    fetch(`/data/cache/region_plants_${regionId}${suffix}.geojson`)
+    fetch(dataPath(`cache/region_plants_${regionId}${suffix}.geojson`))
       .then(r => r.json()).then(d => setPlantCount(d.features.length)).catch(() => {});
   }, [regionId, plantSource]);
 
@@ -239,7 +240,7 @@ export default function RegionPage() {
     let cancelled = false;
     const isos = region.countries.map(c => c.iso);
     Promise.all(isos.map(iso =>
-      fetch(`/data/trade/${iso}.json`).then(r => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(dataPath(`trade/${iso}.json`)).then(r => (r.ok ? r.json() : null)).catch(() => null),
     )).then(results => {
       if (cancelled) return;
       let withData = 0, isolated = 0, netExp = 0, netImp = 0, tradedGwh = 0, tradeYear = null;
@@ -304,11 +305,11 @@ export default function RegionPage() {
       const [countries, boundaries, plantsGJ, linesGJ, subsGJ, lcGJ] = await Promise.all([
         fetchCountries('10m'),
         fetchBoundaries('10m'),
-        fetch(`/data/cache/region_plants_${regionId}.geojson`).then(r => r.json()),
-        fetch(`/data/cache/region_lines_${regionId}.geojson`).then(r => r.json()),
-        fetch(`/data/cache/region_substations_${regionId}.geojson`)
+        fetch(dataPath(`cache/region_plants_${regionId}.geojson`)).then(r => r.json()),
+        fetch(dataPath(`cache/region_lines_${regionId}.geojson`)).then(r => r.json()),
+        fetch(dataPath(`cache/region_substations_${regionId}.geojson`))
           .then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
-        fetch(`/data/region_load_centers_${regionId}.geojson`)
+        fetch(dataPath(`region_load_centers_${regionId}.geojson`))
           .then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
       ]);
 
@@ -682,8 +683,8 @@ export default function RegionPage() {
 
     if (showZones) {
       const slug       = selectedSlug || 'recommended';
-      const url        = `/data/zones/${regionId}_${slug}_zones_hd.geojson`;
-      const corrUrl    = `/data/zones/${regionId}_${slug}_corridors.geojson`;
+      const url        = dataPath(`zones/${regionId}_${slug}_zones_hd.geojson`);
+      const corrUrl    = dataPath(`zones/${regionId}_${slug}_corridors.geojson`);
       Promise.all([
         fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); }),
         fetch(corrUrl).then(r => r.ok ? r.json() : null).catch(() => null),
@@ -888,9 +889,9 @@ export default function RegionPage() {
     if (!map?.getSource('plants') || !mapReady) return;
     const suffix = plantSource === 'gppd' ? '_gppd' : plantSource === 'gem' ? '_gem' : '';
     const f    = `region_plants_${regionId}${suffix}.geojson`;
-    const cf   = `/data/cache/region_capacity_${regionId}${suffix}.json`;
-    const cfBase = `/data/cache/region_capacity_${regionId}.json`;
-    fetch(`/data/cache/${f}`)
+    const cf   = dataPath(`cache/region_capacity_${regionId}${suffix}.json`);
+    const cfBase = dataPath(`cache/region_capacity_${regionId}.json`);
+    fetch(dataPath(`cache/${f}`))
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => {
         map.getSource('plants').setData(data);
@@ -919,7 +920,7 @@ export default function RegionPage() {
   const handleDownloadPlants = useCallback(async (format = 'geojson') => {
     track('data_download', { type: 'plants', format, source: plantSource, region: regionId });
     const suffix = plantSource === 'gppd' ? '_gppd' : plantSource === 'gem' ? '_gem' : '';
-    const url  = `/data/cache/region_plants_${regionId}${suffix}.geojson`;
+    const url  = dataPath(`cache/region_plants_${regionId}${suffix}.geojson`);
     const data = await fetch(url).then(r => r.json());
     if (format === 'csv') {
       const header = 'name,fuel,mw,country,status,lat,lon,source';
@@ -975,7 +976,7 @@ export default function RegionPage() {
 
   const handleDownloadLines = useCallback(async (format = 'geojson') => {
     track('data_download', { type: 'lines', format, region: regionId });
-    const url  = `/data/cache/region_lines_${regionId}.geojson`;
+    const url  = dataPath(`cache/region_lines_${regionId}.geojson`);
     const data = await fetch(url).then(r => r.json());
     // What you see is what you get: the legend toggles and the min-kV slider sit
     // next to this button, so the file matches the map rather than the raw cache.

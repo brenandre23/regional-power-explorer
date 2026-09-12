@@ -1,3 +1,4 @@
+import { dataPath } from '../../utils/paths';
 import { useState, useEffect, useRef } from 'react';
 import { FUEL_COLORS, getT } from '../../constants';
 import ChartCaption from '../ChartCaption';
@@ -345,12 +346,12 @@ export default function SupplyTab({ iso, theme }) {
     setTradeLoading(true);  setTradeData(null);
     setHiddenFuels(new Set()); setHiddenPartners(new Set());
 
-    fetch(`/data/supply/${iso}.json`)
+    fetch(dataPath(`supply/${iso}.json`))
       .then(r => { if (!r.ok) throw new Error('404'); return r.json(); })
       .then(d  => { setSupplyData(d); setSupplyLoading(false); })
       .catch(() => setSupplyLoading(false));
 
-    fetch(`/data/trade/${iso}.json`)
+    fetch(dataPath(`trade/${iso}.json`))
       .then(r => { if (!r.ok) throw new Error('404'); return r.json(); })
       .then(d  => { setTradeData(d); setTradeLoading(false); })
       .catch(() => setTradeLoading(false));

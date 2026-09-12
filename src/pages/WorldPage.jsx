@@ -1,3 +1,4 @@
+import { dataPath } from '../utils/paths';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
@@ -25,7 +26,7 @@ export default function WorldPage() {
   }, []);
 
   useEffect(() => {
-    fetch('/data/regions.json').then(r => r.json()).then(d => setRegions(d.regions));
+    fetch(dataPath('regions.json')).then(r => r.json()).then(d => setRegions(d.regions));
   }, []);
 
   // --- Cluster marker helpers ---

@@ -1,3 +1,4 @@
+import { dataPath } from '../utils/paths';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { track } from '../analytics';
@@ -243,33 +244,33 @@ export default function CountryPage() {
 
   // Static data — fetch once
   useEffect(() => {
-    fetch('/data/tariffs.json').then(r => r.json()).then(setTariffs).catch(() => {});
-    fetch('/data/access.json').then(r => r.json()).then(setAccess).catch(() => {});
-    fetch('/data/zones/index.json').then(r => r.json()).then(setZonesIndex).catch(() => setZonesIndex({}));
+    fetch(dataPath('tariffs.json')).then(r => r.json()).then(setTariffs).catch(() => {});
+    fetch(dataPath('access.json')).then(r => r.json()).then(setAccess).catch(() => {});
+    fetch(dataPath('zones/index.json')).then(r => r.json()).then(setZonesIndex).catch(() => setZonesIndex({}));
   }, []);
 
   useEffect(() => {
-    fetch('/data/regions.json').then(r => r.json()).then(d => {
+    fetch(dataPath('regions.json')).then(r => r.json()).then(d => {
       for (const region of (d.regions || [])) {
         if (region.type === 'meta') continue; // meta-regions have no cache files
         const country = region.countries.find(c => c.iso === iso);
         if (country) {
           setInfo({ country, region });
           // Check GPPD and GEM availability for this region
-          fetch(`/data/cache/region_plants_${region.id}_gppd.geojson`, { method: 'HEAD' })
+          fetch(dataPath(`cache/region_plants_${region.id}_gppd.geojson`), { method: 'HEAD' })
             .then(r => setGppdAvailable(r.ok))
             .catch(() => setGppdAvailable(false));
-          fetch(`/data/cache/region_plants_${region.id}_gem.geojson`, { method: 'HEAD' })
+          fetch(dataPath(`cache/region_plants_${region.id}_gem.geojson`), { method: 'HEAD' })
             .then(r => setGemAvailable(r.ok))
             .catch(() => setGemAvailable(false));
           if (BRIEFS_ENABLED) {
-            fetch(`/data/notes/${iso}.html`, { method: 'HEAD' })
+            fetch(dataPath(`notes/${iso}.html`), { method: 'HEAD' })
               .then(r => setHasNote(r.ok))
               .catch(() => setHasNote(false));
           } else {
             setHasNote(false);
           }
-          fetch(`/data/market/${iso}.json`, { method: 'HEAD' })
+          fetch(dataPath(`market/${iso}.json`), { method: 'HEAD' })
             // Dev server (and some static hosts) return 200 + index.html for
             // any unmatched path, so r.ok alone can't tell a real JSON file
             // from the SPA fallback — only every country having a notes file
@@ -314,11 +315,11 @@ export default function CountryPage() {
       const [countries, boundaries, plantsGJ, linesGJ, subsGJ, lcGJ, admin1GJ] = await Promise.all([
         fetchCountries('10m'),
         fetchBoundaries('10m'),
-        fetch(`/data/cache/region_plants_${region.id}.geojson`).then(r => r.json()),
-        fetch(`/data/cache/region_lines_${region.id}.geojson`).then(r => r.json()),
-        fetch(`/data/cache/region_substations_${region.id}.geojson`).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
-        fetch(`/data/region_load_centers_${region.id}.geojson`).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
-        fetch(`/data/cache/region_admin1_${region.id}.geojson`).then(r => r.ok ? r.json() : { type: 'FeatureCollection', features: [] }).catch(() => ({ type: 'FeatureCollection', features: [] })),
+        fetch(dataPath(`cache/region_plants_${region.id}.geojson`)).then(r => r.json()),
+        fetch(dataPath(`cache/region_lines_${region.id}.geojson`)).then(r => r.json()),
+        fetch(dataPath(`cache/region_substations_${region.id}.geojson`)).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
+        fetch(dataPath(`region_load_centers_${region.id}.geojson`)).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
+        fetch(dataPath(`cache/region_admin1_${region.id}.geojson`)).then(r => r.ok ? r.json() : { type: 'FeatureCollection', features: [] }).catch(() => ({ type: 'FeatureCollection', features: [] })),
       ]);
 
       const bounds = fitBoundsCountry(iso, countries);
@@ -926,10 +927,10 @@ export default function CountryPage() {
     const label = `${iso}_${nZones}z`;
 
     Promise.all([
-      fetch(`/data/zones/${label}_zones.geojson`).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch(`/data/zones/${label}_topo.json`).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch(`/data/zones/${label}_corridors.geojson`).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch(`/data/zones/${label}_outside.geojson`).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(dataPath(`zones/${label}_zones.geojson`)).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(dataPath(`zones/${label}_topo.json`)).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(dataPath(`zones/${label}_corridors.geojson`)).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(dataPath(`zones/${label}_outside.geojson`)).then(r => r.ok ? r.json() : null).catch(() => null),
     ]).then(([zonesGJ, topo, corridorsGJ, outsideGJ]) => {
       if (!zonesGJ || !map.getSource('zone-fills')) return;
       zonesGJ.features.forEach((f, i) => { f.properties.color = COLORS[i % COLORS.length]; });
@@ -1001,7 +1002,7 @@ export default function CountryPage() {
     if (!map?.getSource('plants') || !info || !countryReady) return;
     const suffix = plantSource === 'gppd' ? '_gppd' : plantSource === 'gem' ? '_gem' : '';
     const filename = `region_plants_${info.region.id}${suffix}.geojson`;
-    fetch(`/data/cache/${filename}`)
+    fetch(dataPath(`cache/${filename}`))
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => {
         const cf = countryFeatureRef.current;
@@ -1026,8 +1027,8 @@ export default function CountryPage() {
     if (!info) return;
     setCapacity(null);
     const capSuffix = plantSource === 'gppd' ? '_gppd' : plantSource === 'gem' ? '_gem' : '';
-    const baseUrl    = `/data/cache/region_capacity_${info.region.id}.json`;
-    const primaryUrl = capSuffix ? `/data/cache/region_capacity_${info.region.id}${capSuffix}.json` : null;
+    const baseUrl    = dataPath(`cache/region_capacity_${info.region.id}.json`);
+    const primaryUrl = capSuffix ? dataPath(`cache/region_capacity_${info.region.id}${capSuffix}.json`) : null;
     Promise.all([
       fetch(baseUrl).then(r => r.json()).catch(() => null),
       primaryUrl ? fetch(primaryUrl).then(r => r.json()).catch(() => null) : Promise.resolve(null),
@@ -1044,7 +1045,7 @@ export default function CountryPage() {
   useEffect(() => {
     setFleetAge(null);
     if (!info || plantSource !== 'gppd') return;
-    fetch(`/data/cache/region_age_${info.region.id}_gppd.json`)
+    fetch(dataPath(`cache/region_age_${info.region.id}_gppd.json`))
       .then(r => r.ok ? r.json() : null)
       .then(setFleetAge)
       .catch(() => setFleetAge(null));
@@ -1443,7 +1444,7 @@ export default function CountryPage() {
             </div>
             <iframe
               ref={noteIframeRef}
-              src={`/data/notes/${iso}.html`}
+              src={dataPath(`notes/${iso}.html`)}
               title={`${country.name} – Sector Briefing Note`}
               style={{ flex: 1, border: 'none', width: '100%' }}
             />

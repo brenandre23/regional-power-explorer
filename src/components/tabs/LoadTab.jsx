@@ -1,3 +1,4 @@
+import { dataPath } from '../../utils/paths';
 import { useState, useEffect } from 'react';
 import { getT } from '../../constants';
 
@@ -207,7 +208,7 @@ export default function LoadTab({ iso, theme }) {
     setLoading(true); setError(false); setPts(null); setPeakMW(null); setSource(null);
 
     // Try supply JSON first (authoritative national source)
-    fetch(`/data/supply/${iso}.json`)
+    fetch(dataPath(`supply/${iso}.json`))
       .then(r => { if (!r.ok) throw new Error('no supply'); return r.json(); })
       .then(data => {
         const gen = data.generation;

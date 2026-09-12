@@ -1,3 +1,4 @@
+import { dataPath } from '../utils/paths';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
@@ -15,7 +16,7 @@ export default function MetaRegionPage({ region }) {
   const [subregions, setSubregions] = useState([]);
 
   useEffect(() => {
-    fetch('/data/regions.json').then(r => r.json()).then(d => {
+    fetch(dataPath('regions.json')).then(r => r.json()).then(d => {
       setSubregions((d.regions || []).filter(r => r.parent === region.id));
     });
   }, [region.id]);
