@@ -2,11 +2,6 @@ name: Build for Design Studio
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - design-studio-deployment
-    paths:
-      - '.github/workflows/build-design-studio.yml'
 
 permissions:
   contents: read
