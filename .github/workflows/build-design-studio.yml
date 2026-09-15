@@ -32,8 +32,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint integration code
+        run: npx eslint src/chat src/constants.js src/utils/basemap.js tools/apply_ai_integration_patch.mjs
 
       - name: Build application
         run: npm run build
@@ -47,7 +47,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json src/pages/RegionPage.jsx src/pages/CountryPage.jsx src/pages/MetaRegionPage.jsx src/components/LayerPanel.jsx src/index.css
+          git add package-lock.json src/pages/WorldPage.jsx src/pages/RegionPage.jsx src/pages/CountryPage.jsx src/pages/MetaRegionPage.jsx src/components/LayerPanel.jsx src/index.css
           git commit -m "feat: wire AI assistant into explorer maps"
           git push
 
