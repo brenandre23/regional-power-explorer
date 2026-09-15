@@ -13,10 +13,14 @@ function patch(path, replacements) {
   console.log(`${changed ? 'patched' : 'current'} ${path}`);
 }
 
+patch('src/pages/WorldPage.jsx', [
+  ["<MapChat theme={theme} mapRef={mapRef} mapKey={mapReady ? mapRef.current : null} ready={mapReady}", "<MapChat theme={theme} mapRef={mapRef} ready={mapReady}"],
+]);
+
 patch('src/pages/RegionPage.jsx', [
   ["import LayerPanel from '../components/LayerPanel';\n", "import LayerPanel from '../components/LayerPanel';\nimport MapChat from '../chat/MapChat';\n"],
   ["      raiseBoundaries(map);\n      setMapReady(true);", "      swapBasemap(map, basemap, theme);\n      if (basemap === 'satellite') toggleSatLabels(map, satLabels, theme);\n      raiseBoundaries(map);\n      setMapReady(true);"],
-  ["    >\n      {isMobile && layerPanelOpen && (", `    >\n      <MapChat theme={theme} mapRef={mapRef} mapKey={mapReady ? mapRef.current : null} ready={mapReady} controller={{\n        page: 'region', regionId, tab: activeTab, navigate,\n        setTab: setActiveTab, setPlantSource, setMinMw: handleMinMw,\n        showOnlyFuels: fuels => { for (const f of presentFuels) if (fuelsOff.has(f) === fuels.includes(f)) toggleFuel(f); },\n      }} />\n      {isMobile && layerPanelOpen && (`],
+  ["    >\n      {isMobile && layerPanelOpen && (", `    >\n      <MapChat theme={theme} mapRef={mapRef} ready={mapReady} controller={{\n        page: 'region', regionId, tab: activeTab, navigate,\n        setTab: setActiveTab, setPlantSource, setMinMw: handleMinMw,\n        showOnlyFuels: fuels => { for (const f of presentFuels) if (fuelsOff.has(f) === fuels.includes(f)) toggleFuel(f); },\n      }} />\n      {isMobile && layerPanelOpen && (`],
 ]);
 
 patch('src/pages/CountryPage.jsx', [
@@ -27,7 +31,7 @@ patch('src/pages/CountryPage.jsx', [
   ["    mapReadyRef.current = false;\n    countryFeatureRef.current = null;", "    mapReadyRef.current = false;\n    setMapReady(false);\n    countryFeatureRef.current = null;"],
   ["      mapReadyRef.current = true;\n\n      raiseBoundaries(map);", "      mapReadyRef.current = true;\n      setMapReady(true);\n\n      swapBasemap(map, basemap, theme);\n      if (basemap === 'satellite') toggleSatLabels(map, satLabels, theme);\n      raiseBoundaries(map);"],
   ["    return () => { mapReadyRef.current = false; popup.remove(); mapRef.current?.remove(); };", "    return () => { mapReadyRef.current = false; setMapReady(false); popup.remove(); mapRef.current?.remove(); };"],
-  ["    >\n      {isMobile && layerPanelOpen && (", `    >\n      <MapChat theme={theme} mapRef={mapRef} mapKey={mapReady ? mapRef.current : null} ready={mapReady} controller={{\n        page: 'country', iso, regionId: info?.region?.id, tab: activeTab, navigate,\n        setTab: setActiveTab, setPlantSource, setMinMw: handleMinMw,\n        showOnlyFuels: fuels => { for (const f of presentFuels) if (fuelsOff.has(f) === fuels.includes(f)) toggleFuel(f); },\n      }} />\n      {isMobile && layerPanelOpen && (`],
+  ["    >\n      {isMobile && layerPanelOpen && (", `    >\n      <MapChat theme={theme} mapRef={mapRef} ready={mapReady} controller={{\n        page: 'country', iso, regionId: info?.region?.id, tab: activeTab, navigate,\n        setTab: setActiveTab, setPlantSource, setMinMw: handleMinMw,\n        showOnlyFuels: fuels => { for (const f of presentFuels) if (fuelsOff.has(f) === fuels.includes(f)) toggleFuel(f); },\n      }} />\n      {isMobile && layerPanelOpen && (`],
 ]);
 
 patch('src/components/LayerPanel.jsx', [
