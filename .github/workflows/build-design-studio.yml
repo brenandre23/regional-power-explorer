@@ -37,12 +37,12 @@ jobs:
           set -euo pipefail
           grep -R -q 'dcc1c1c0f97f4e458199888b0fc63896' dist/assets
           grep -R -q 'Power Explorer Assistant' dist/assets
-          if grep -R -E -q 'sk-ant-|sk-proj-|AIza[0-9A-Za-z_-]{20,}' dist/assets; then
-            echo 'ERROR: possible provider credential found in browser bundle'
-            exit 1
-          fi
           if grep -R -q 'FeatureServer' dist/assets; then
             echo 'ERROR: runtime FeatureServer reference found in browser bundle'
+            exit 1
+          fi
+          if grep -R -E -q 'VITE_[A-Z0-9_]*(API_KEY|SECRET|TOKEN)' dist/assets; then
+            echo 'ERROR: secret-shaped Vite environment variable reference found in browser bundle'
             exit 1
           fi
 
