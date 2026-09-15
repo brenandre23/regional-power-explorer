@@ -252,7 +252,7 @@ export default function WorldPage() {
 
   return (
     <div style={{ height: 'calc(100vh - 46px)', position: 'relative', backgroundColor: t.bg }}>
-      <MapChat theme={theme} mapRef={mapRef} mapKey={mapReady ? mapRef.current : null} ready={mapReady} controller={{ page: 'world', navigate }} />
+      <MapChat theme={theme} mapRef={mapRef} ready={mapReady} controller={{ page: 'world', navigate }} />
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
       {disambig && (

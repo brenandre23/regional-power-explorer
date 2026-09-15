@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
 import { useTheme } from '../App';
 import { getT, mapStyle } from '../constants';
-import { fetchCountries, addCountriesSource } from '../utils/basemap';
+import { fetchCountries, addCountriesSource, raiseBoundaries } from '../utils/basemap';
 
 export default function MetaRegionPage({ region }) {
   const { theme }  = useTheme();
@@ -45,6 +45,8 @@ export default function MetaRegionPage({ region }) {
         filter: ['in', ['get', 'ISO_A3'], ['literal', allIsos]],
         paint: { 'line-color': region.color, 'line-width': 1.2, 'line-opacity': 0.6 },
       });
+
+      raiseBoundaries(map);
 
       markersRef.current = subregions.map(sub => {
         const el = document.createElement('div');
