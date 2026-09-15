@@ -38,6 +38,12 @@ const layerIdFor = style => `boundaries-${style.toLowerCase().replace(/ /g, '-')
 /** Every layer this module draws above the country fills, in drawing order. */
 const BROKEN_LAYERS = ['boundaries-mask', ...LINE_STYLES.map(s => layerIdFor(s.style))];
 
+const WB_REFERENCE_SOURCES = new Set(['wbg_borders', 'country_names', 'wbg_admin_labels', 'wbg_places']);
+
+function hasWorldBankVectorBasemap(map) {
+  return !!map?.getSource?.('wbg_borders');
+}
+
 async function fetchJson(path) {
   return fetch(path).then(r => r.json());
 }
@@ -80,6 +86,11 @@ export async function fetchBoundaries(resolution = '10m') {
  * @param {object} boundaries  a FeatureCollection from fetchBoundaries()
  */
 export function addBaseLayers(map, t, boundaries) {
+  // The approved ArcGIS vector style already supplies World Bank land, political
+  // boundaries (including disputed styles), and labels. Keep the local country
+  // GeoJSON only for interaction/highlight geometry; drawing a second boundary
+  // stack would create double lines and can contradict the authoritative style.
+  if (hasWorldBankVectorBasemap(map)) return;
   map.addSource('boundaries', { type: 'geojson', data: boundaries });
 
   map.addLayer({
@@ -163,7 +174,7 @@ export function regionFilter(isos, areas = []) {
  * @param {number} opts.opacity
  */
 export function addRegionCoast(map, { areas, color, width, opacity }) {
-  if (!areas?.length) return;
+  if (!areas?.length || !map.getSource('boundaries')) return;
   map.addLayer({
     id: 'region-coast', type: 'line', source: 'boundaries',
     filter: ['all', ['==', ['get', 'STYLE'], ''],
@@ -180,6 +191,21 @@ export function addRegionCoast(map, { areas, color, width, opacity }) {
  * @param {import('maplibre-gl').Map} map
  */
 export function raiseBoundaries(map) {
+  if (hasWorldBankVectorBasemap(map)) {
+    // Operational layers are added after the base style, so without this pass
+    // they would sit on top of disputed-boundary dashes and official labels.
+    // Lift only policy/reference layers, preserving their style order.
+    const layers = map.getStyle()?.layers || [];
+    const refs = layers.filter(layer => {
+      if (!WB_REFERENCE_SOURCES.has(layer.source)) return false;
+      if (layer.source === 'wbg_borders') return layer.type === 'line';
+      return layer.type === 'symbol';
+    });
+    for (const layer of refs) {
+      try { map.moveLayer(layer.id); } catch { /* style race during teardown */ }
+    }
+    return;
+  }
   for (const id of BROKEN_LAYERS) {
     if (map.getLayer(id)) map.moveLayer(id);
   }
