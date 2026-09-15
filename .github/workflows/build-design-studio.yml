@@ -32,6 +32,20 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Production safety smoke checks
+        run: |
+          set -euo pipefail
+          grep -R -q 'dcc1c1c0f97f4e458199888b0fc63896' dist/assets
+          grep -R -q 'Power Explorer Assistant' dist/assets
+          if grep -R -E -q 'sk-ant-|sk-proj-|AIza[0-9A-Za-z_-]{20,}' dist/assets; then
+            echo 'ERROR: possible provider credential found in browser bundle'
+            exit 1
+          fi
+          if grep -R -q 'FeatureServer' dist/assets; then
+            echo 'ERROR: runtime FeatureServer reference found in browser bundle'
+            exit 1
+          fi
+
       - name: Upload production build
         uses: actions/upload-artifact@v4
         with:
