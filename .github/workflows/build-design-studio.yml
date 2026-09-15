@@ -7,7 +7,7 @@ on:
       - ai-chat-production-integration
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -17,39 +17,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Apply integration migration
-        run: node tools/apply_ai_integration_patch.mjs
-
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '24'
           cache: 'npm'
 
-      - name: Refresh dependency lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
       - name: Lint integration code
-        run: npx eslint src/chat src/constants.js src/utils/basemap.js tools/apply_ai_integration_patch.mjs
+        run: npx eslint src/chat src/constants.js src/utils/basemap.js
 
       - name: Build application
         run: npm run build
-
-      - name: Commit generated integration changes on feature branch
-        if: github.ref_name == 'ai-chat-production-integration'
-        run: |
-          if git diff --quiet; then
-            echo "integration files already current"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json src/pages/WorldPage.jsx src/pages/RegionPage.jsx src/pages/CountryPage.jsx src/pages/MetaRegionPage.jsx src/components/LayerPanel.jsx src/index.css
-          git commit -m "feat: wire AI assistant into explorer maps"
-          git push
 
       - name: Upload production build
         uses: actions/upload-artifact@v4
