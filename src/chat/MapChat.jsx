@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { AiChatControl } from '@imaps/ai-chat/maplibre';
 import { getT } from '../constants';
 import { useLocalServer } from './useLocalServer';
@@ -52,16 +52,16 @@ function applyTheme(el, theme) {
   if (button) Object.assign(button.style, { color: t.text, background: 'transparent' });
 }
 
-export default function MapChat({ mapRef, mapKey, ready, controller, theme }) {
+export default function MapChat({ mapRef, ready, controller, theme }) {
   useAppController(controller);
   const dataServers = useLocalServer(buildDataServer, 'data');
   const appServers = useLocalServer(buildAppControlServer, 'app');
-  const [control, setControl] = useState(null);
+  const controlRef = useRef(null);
 
   useEffect(() => {
-    if (!mapKey) return undefined;
+    if (!ready) return undefined;
     const map = mapRef.current;
-    if (!map || map !== mapKey) return undefined;
+    if (!map) return undefined;
 
     const ctrl = new AiChatControl({
       label: 'AI assistant',
@@ -78,20 +78,26 @@ export default function MapChat({ mapRef, mapKey, ready, controller, theme }) {
         deployment: chatDeployment(),
       },
     });
+    ctrl.localServers = [...dataServers, ...appServers];
     map.addControl(ctrl, 'bottom-right');
-    setControl(ctrl);
+    controlRef.current = ctrl;
+    applyTheme(ctrl.element, theme);
 
     return () => {
       try { if (map.hasControl(ctrl)) map.removeControl(ctrl); } catch { /* map teardown */ }
-      setControl(null);
+      if (controlRef.current === ctrl) controlRef.current = null;
     };
-  }, [mapRef, mapKey]);
+  }, [mapRef, ready]);
 
   useEffect(() => {
-    if (control) control.localServers = [...dataServers, ...appServers];
-  }, [control, dataServers, appServers]);
-  useEffect(() => { if (control?.element) control.element.disabled = !ready; }, [control, ready]);
-  useEffect(() => { if (control?.element) applyTheme(control.element, theme); }, [control, theme]);
+    const ctrl = controlRef.current;
+    if (ctrl) ctrl.localServers = [...dataServers, ...appServers];
+  }, [dataServers, appServers]);
+
+  useEffect(() => {
+    const el = controlRef.current?.element;
+    if (el) applyTheme(el, theme);
+  }, [theme]);
 
   return null;
 }
