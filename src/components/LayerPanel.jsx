@@ -157,8 +157,8 @@ export default function LayerPanel({
           <span style={{ ...sec, display: 'block', marginBottom: 6 }}>Basemap</span>
           <div style={{ display: 'flex', gap: 4 }}>
             {[
-              { id: 'minimal',   label: 'Minimal' },
-              { id: 'labeled',   label: 'Labeled' },
+              { id: 'minimal',   label: 'WB Clean' },
+              { id: 'labeled',   label: 'WB Labeled' },
               { id: 'satellite', label: 'Satellite' },
             ].map(({ id, label }) => {
               const active = (basemap || 'minimal') === id;

@@ -2,6 +2,9 @@ name: Build for Design Studio
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - ai-chat-production-integration
 
 permissions:
   contents: read
@@ -12,19 +15,36 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint integration code
+        run: npx eslint src/chat src/constants.js src/utils/basemap.js
 
       - name: Build application
         run: npm run build
+
+      - name: Production safety smoke checks
+        run: |
+          set -euo pipefail
+          grep -R -q 'dcc1c1c0f97f4e458199888b0fc63896' dist/assets
+          grep -R -q 'Power Explorer Assistant' dist/assets
+          if grep -R -q 'FeatureServer' dist/assets; then
+            echo 'ERROR: runtime FeatureServer reference found in browser bundle'
+            exit 1
+          fi
+          if grep -R -E -q 'VITE_[A-Z0-9_]*(API_KEY|SECRET|TOKEN)' dist/assets; then
+            echo 'ERROR: secret-shaped Vite environment variable reference found in browser bundle'
+            exit 1
+          fi
 
       - name: Upload production build
         uses: actions/upload-artifact@v4

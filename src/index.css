@@ -41,6 +41,7 @@ a { text-decoration: none; color: inherit; }
 .maplibregl-ctrl-attrib { display: none !important; }
 .maplibregl-ctrl-logo   { display: none !important; }
 .maplibregl-ctrl-bottom-right { display: none !important; }
+.maplibregl-ctrl-bottom-right:has(.imaps-ai-chat-ctrl) { display: block !important; }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }

@@ -4,6 +4,7 @@ import maplibregl from 'maplibre-gl';
 import { useTheme } from '../App';
 import { getT, mapStyle } from '../constants';
 import { fetchCountries, fetchBoundaries, addCountriesSource, addBaseLayers, regionFilter, addRegionCoast, raiseBoundaries } from '../utils/basemap';
+import MapChat from '../chat/MapChat';
 
 export default function WorldPage() {
   const { theme } = useTheme();
@@ -17,6 +18,7 @@ export default function WorldPage() {
   const [metaActive, setMetaActive] = useState(null); // region obj or null
   const [disambig, setDisambig] = useState(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 700);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 700);
@@ -28,7 +30,6 @@ export default function WorldPage() {
     fetch('/data/regions.json').then(r => r.json()).then(d => setRegions(d.regions));
   }, []);
 
-  // --- Cluster marker helpers ---
   function buildClusterEl(sub, meta) {
     const wrap = document.createElement('div');
     wrap.style.cssText = 'position:relative;width:80px;height:80px;display:flex;flex-direction:column;align-items:center;cursor:pointer;';
@@ -98,13 +99,10 @@ export default function WorldPage() {
     if (mapRef.current) applyMetaMarkers(next, mapRef.current);
   }
 
-  // Main map effect
   useEffect(() => {
     if (!containerRef.current || !regions) return;
 
     const isoToRegions = {};
-    // Areas the Bank attributes to no country carry no code, so they are keyed
-    // on WB_NAME instead. See regionFilter() in src/utils/basemap.js.
     const areaToRegions = {};
     const available = regions.filter(r => r.status === 'available');
     for (const r of available) {
@@ -173,7 +171,6 @@ export default function WorldPage() {
           paint: { 'line-color': colorExpr, 'line-width': 0.9, 'line-opacity': 0.7 },
         });
 
-        // The areas take the same outline, keyed on the only name they carry.
         addRegionCoast(map, {
           areas: availableAreas,
           color: ['match', ['get', 'NAME'],
@@ -230,18 +227,18 @@ export default function WorldPage() {
 
       raiseBoundaries(map);
 
-      // Restore meta markers after map rebuild (e.g., theme change)
       if (metaActiveRef.current) applyMetaMarkers(metaActiveRef.current, map);
+      setMapReady(true);
     });
 
     return () => {
-      metaMarkersRef.current = []; // map.remove() detaches them
+      metaMarkersRef.current = [];
       mapRef.current?.remove();
+      setMapReady(false);
       setDisambig(null);
     };
   }, [regions, theme]);
 
-  // Build flattened legend items (main regions + sub-regions when meta is active)
   const legendItems = regions
     ? regions.flatMap(r => {
         if (r.type === 'sub') return [];
@@ -255,9 +252,9 @@ export default function WorldPage() {
 
   return (
     <div style={{ height: 'calc(100vh - 46px)', position: 'relative', backgroundColor: t.bg }}>
+      <MapChat theme={theme} mapRef={mapRef} ready={mapReady} controller={{ page: 'world', navigate }} />
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
-      {/* Disambiguation popover */}
       {disambig && (
         <>
           <div
@@ -306,7 +303,6 @@ export default function WorldPage() {
         </>
       )}
 
-      {/* Region legend */}
       {regions && !isMobile && (
         <div style={{
           position: 'absolute', bottom: 70, left: 24,
@@ -363,7 +359,6 @@ export default function WorldPage() {
         </div>
       )}
 
-      {/* Tap / Click hint — top right */}
       <div style={{
         position: 'absolute', top: 10, right: 12, zIndex: 50,
         backgroundColor: t.panel, border: `1px solid ${t.panelBorder}`,
@@ -387,7 +382,6 @@ export default function WorldPage() {
         </div>
       </div>
 
-      {/* ── Map disclaimer ── */}
       <div style={{
         position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)',
         zIndex: 50, pointerEvents: 'none',
