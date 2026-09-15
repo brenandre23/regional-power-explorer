@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { AiChatControl } from '@imaps/ai-chat/maplibre';
 import { getT } from '../constants';
 import { useLocalServer } from './useLocalServer';
 import { buildDataServer } from './dataServer';
@@ -63,27 +62,42 @@ export default function MapChat({ mapRef, ready, controller, theme }) {
     const map = mapRef.current;
     if (!map) return undefined;
 
-    const ctrl = new AiChatControl({
-      label: 'AI assistant',
-      width: 430,
-      height: 640,
-      screenshot: true,
-      chat: {
-        title: 'Power Explorer Assistant',
-        greeting: 'Ask about capacity, generation, trade, access, tariffs, or tell me how to change the map.',
-        placeholder: 'Ask about the power system…',
-        systemPrompt: SYSTEM_PROMPT,
-        defaultProvider: AI_PROVIDER,
-        disabledPlaceholder: 'Loading dashboard data…',
-        deployment: chatDeployment(),
-      },
+    let disposed = false;
+    let ctrl = null;
+
+    (async () => {
+      // Keep the alpha chat UI out of the critical dashboard bundle. The MCP
+      // bridge is available immediately, while the relatively heavy provider/
+      // chat UI code is fetched only after a map has actually become usable.
+      const { AiChatControl } = await import('@imaps/ai-chat/maplibre');
+      if (disposed) return;
+
+      ctrl = new AiChatControl({
+        label: 'AI assistant',
+        width: 430,
+        height: 640,
+        screenshot: true,
+        chat: {
+          title: 'Power Explorer Assistant',
+          greeting: 'Ask about capacity, generation, trade, access, tariffs, or tell me how to change the map.',
+          placeholder: 'Ask about the power system…',
+          systemPrompt: SYSTEM_PROMPT,
+          defaultProvider: AI_PROVIDER,
+          disabledPlaceholder: 'Loading dashboard data…',
+          deployment: chatDeployment(),
+        },
+      });
+      ctrl.localServers = [...dataServers, ...appServers];
+      map.addControl(ctrl, 'bottom-right');
+      controlRef.current = ctrl;
+      applyTheme(ctrl.element, theme);
+    })().catch(error => {
+      if (!disposed) console.error('Failed to load Power Explorer Assistant', error);
     });
-    ctrl.localServers = [...dataServers, ...appServers];
-    map.addControl(ctrl, 'bottom-right');
-    controlRef.current = ctrl;
-    applyTheme(ctrl.element, theme);
 
     return () => {
+      disposed = true;
+      if (!ctrl) return;
       try { if (map.hasControl(ctrl)) map.removeControl(ctrl); } catch { /* map teardown */ }
       if (controlRef.current === ctrl) controlRef.current = null;
     };
