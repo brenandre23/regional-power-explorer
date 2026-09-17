@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
 import { useTheme } from '../App';
-import { getT, mapStyle } from '../constants';
-import { fetchCountries, fetchBoundaries, addCountriesSource, addBaseLayers, regionFilter, addRegionCoast, raiseBoundaries } from '../utils/basemap';
+import { getT } from '../constants';
+import { buildWbStyle, useWbStyleBase } from '../utils/wbStyle';
+import { fetchGeo, fetchNdlsa, addCountriesSource, regionFilter, addNdlsaLayer, raiseBoundaries, fillAnchor } from '../utils/basemap';
 
 export default function WorldPage() {
   const { theme } = useTheme();
@@ -15,6 +16,7 @@ export default function WorldPage() {
   const metaMarkersRef = useRef([]);
   const metaActiveRef = useRef(null);
   const [regions, setRegions] = useState(null);
+  const wbBase = useWbStyleBase();
   const [metaActive, setMetaActive] = useState(null); // region obj or null
   const [disambig, setDisambig] = useState(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 700);
@@ -101,11 +103,11 @@ export default function WorldPage() {
 
   // Main map effect
   useEffect(() => {
-    if (!containerRef.current || !regions) return;
+    if (!containerRef.current || !regions || !wbBase) return;
 
     const isoToRegions = {};
     // Areas the Bank attributes to no country carry no code, so they are keyed
-    // on WB_NAME instead. See regionFilter() in src/utils/basemap.js.
+    // on WB_NAME instead. See regions.json `non_determined`.
     const areaToRegions = {};
     const available = regions.filter(r => r.status === 'available');
     for (const r of available) {
@@ -120,13 +122,15 @@ export default function WorldPage() {
       }
     }
     const availableIsos = Object.keys(isoToRegions);
-    const availableAreas = Object.keys(areaToRegions);
     const regionsFor = p =>
       (p.STATUS === 'non-determined' ? areaToRegions[p.WB_NAME] : isoToRegions[p.ISO_A3]) || [];
+    // A country's colour on this map is its first region's.
+    const colorForIso = iso => isoToRegions[iso]?.[0].color || null;
 
+    let disposed = false;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: mapStyle(theme),
+      style: buildWbStyle(wbBase, t),
       center: [20, 15],
       zoom: 2.2,
       minZoom: 1.5,
@@ -138,59 +142,46 @@ export default function WorldPage() {
     map.on('movestart', () => setDisambig(null));
 
     map.on('load', async () => {
-      const countries = await fetchCountries('110m');
-      const boundaries = await fetchBoundaries('110m');
-
+      const [countries, ndlsa] = await Promise.all([fetchGeo('world'), fetchNdlsa()]);
+      if (disposed) return;
       addCountriesSource(map, countries);
-      addBaseLayers(map, t, boundaries);
 
       if (availableIsos.length) {
-        const byIso = ['match', ['get', 'ISO_A3'],
+        const colorExpr = ['match', ['get', 'ISO_A3'],
           ...availableIsos.flatMap(iso => [iso, isoToRegions[iso][0].color]),
           'transparent',
         ];
-        const colorExpr = availableAreas.length
-          ? ['case', ['==', ['get', 'STATUS'], 'non-determined'],
-              ['match', ['get', 'WB_NAME'],
-                ...availableAreas.flatMap(a => [a, areaToRegions[a][0].color]),
-                'transparent'],
-              byIso]
-          : byIso;
         map.addLayer({
           id: 'region-fill',
           type: 'fill',
           source: 'countries',
-          filter: regionFilter(availableIsos, availableAreas),
+          filter: regionFilter(availableIsos),
           paint: {
             'fill-color': colorExpr,
             'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.55, 0.28],
           },
-        });
+        }, fillAnchor(map));
         map.addLayer({
           id: 'region-border',
           type: 'line',
           source: 'countries',
-          filter: ['in', ['get', 'ISO_A3'], ['literal', availableIsos]],
+          filter: regionFilter(availableIsos),
           paint: { 'line-color': colorExpr, 'line-width': 0.9, 'line-opacity': 0.7 },
         });
-
-        // The areas take the same outline, keyed on the only name they carry.
-        addRegionCoast(map, {
-          areas: availableAreas,
-          color: ['match', ['get', 'NAME'],
-            ...availableAreas.flatMap(a => [a, areaToRegions[a][0].color]),
-            'transparent'],
-          width: 0.9, opacity: 0.7,
-        });
       }
+      // Every non-determined area, coloured from its parties; the basemap
+      // draws their outlines. Under the region fill so a hovered country
+      // never looks cut by its neighbour's area.
+      addNdlsaLayer(map, { ndlsa, colorForIso, opacity: 0.28, hoverOpacity: 0.55, before: fillAnchor(map), t });
 
       let hoveredId = null;
       const popup = new maplibregl.Popup({
         closeButton: false, closeOnClick: false, offset: 8,
         className: `popup-${theme}`,
       });
+      const hoverLayers = ['region-fill', 'ndlsa-fill'];
 
-      map.on('mousemove', 'region-fill', e => {
+      map.on('mousemove', hoverLayers, e => {
         map.getCanvas().style.cursor = 'pointer';
         if (hoveredId !== null)
           map.setFeatureState({ source: 'countries', id: hoveredId }, { hover: false });
@@ -202,13 +193,15 @@ export default function WorldPage() {
         const countryName = rs[0]?.countryName || props.WB_NAME || props.ISO_A3;
         const subtitle = rs.length > 1
           ? rs.map(r => r.name).join(' · ') + ' · click to choose'
-          : (rs[0]?.name || '') + ' · click to explore';
+          : rs.length === 1
+            ? rs[0].name + ' · click to explore'
+            : 'Non-determined legal status area';
         popup.setLngLat(e.lngLat)
           .setHTML(`<b>${countryName}</b><br><span style="opacity:0.65">${subtitle}</span>`)
           .addTo(map);
       });
 
-      map.on('mouseleave', 'region-fill', () => {
+      map.on('mouseleave', hoverLayers, () => {
         map.getCanvas().style.cursor = '';
         if (hoveredId !== null)
           map.setFeatureState({ source: 'countries', id: hoveredId }, { hover: false });
@@ -216,7 +209,7 @@ export default function WorldPage() {
         popup.remove();
       });
 
-      map.on('click', 'region-fill', e => {
+      map.on('click', hoverLayers, e => {
         const props = e.features[0].properties;
         const iso = props.ISO_A3 || props.WB_NAME;
         const rs = regionsFor(props);
@@ -236,11 +229,13 @@ export default function WorldPage() {
     });
 
     return () => {
+      disposed = true;
       metaMarkersRef.current = []; // map.remove() detaches them
       mapRef.current?.remove();
+      mapRef.current = null;
       setDisambig(null);
     };
-  }, [regions, theme]);
+  }, [regions, theme, wbBase]);
 
   // Build flattened legend items (main regions + sub-regions when meta is active)
   const legendItems = regions

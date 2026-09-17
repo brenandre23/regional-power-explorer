@@ -5,7 +5,7 @@ import { track } from '../analytics';
 import maplibregl from 'maplibre-gl';
 import { useTheme } from '../App';
 import {
-  getT, mapStyle, swapBasemap, toggleSatLabels, FUEL_COLORS, VOLTAGE_BRACKETS, kvFilterWithFloor, bracketFor, LINE_ATTR_LABELS, lineAttrText, linePopupHTML, visibleLineFeatures, linesToCSV, linesToDownloadGeoJSON,
+  getT, FUEL_COLORS, VOLTAGE_BRACKETS, kvFilterWithFloor, bracketFor, LINE_ATTR_LABELS, lineAttrText, linePopupHTML, visibleLineFeatures, linesToCSV, linesToDownloadGeoJSON,
   plantRadiusExpr, lcRadiusExpr, fuelColorExpr, PLANT_STATUSES, zoneColorExpr, adaptiveMinMw,
   PANEL_WIDTH_MIN, PANEL_WIDTH_DEFAULT, PANEL_WIDTH_MAX,
 } from '../constants';
@@ -14,27 +14,10 @@ import CapacityChart from '../components/CapacityChart';
 import StatsPanel from '../components/StatsPanel';
 import RegionSupplyTrade from '../components/RegionSupplyTrade';
 import MetaRegionPage from './MetaRegionPage';
-import { fetchCountries, fetchBoundaries, addCountriesSource, addBaseLayers, regionFilter, addRegionCoast, raiseBoundaries } from '../utils/basemap';
+import { buildWbStyle, applyWbView, useWbStyleBase, DEFAULT_WB_VIEW } from '../utils/wbStyle';
+import { fetchGeo, fetchBboxes, fetchNdlsa, boundsFor, addCountriesSource, regionFilter, addNdlsaLayer, raiseBoundaries, fillAnchor } from '../utils/basemap';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function fitBounds(isos, countries) {
-  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
-  for (const f of countries.features) {
-    if (!isos.includes(f.properties.ISO_A3)) continue;
-    const geom = f.geometry;
-    const rings = geom.type === 'Polygon'
-      ? geom.coordinates
-      : geom.coordinates.flatMap(p => p);
-    for (const ring of rings)
-      for (const [lon, lat] of ring) {
-        if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
-        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-      }
-  }
-  if (!isFinite(minLon)) return null;
-  return [[minLon - 0.5, minLat - 0.5], [maxLon + 0.5, maxLat + 0.5]];
-}
 
 /** Build the MapLibre filter for a status layer, respecting fuel/country visibility and minMw. */
 function makeLayerFilter(status, fuelsOff, minMw, visibleIsos = null) {
@@ -118,8 +101,9 @@ export default function RegionPage() {
   const [panelWidth,      setPanelWidth]      = useState(PANEL_WIDTH_DEFAULT);
   const [selFeature,      setSelFeature]      = useState(null);
   const [activeTab,       setActiveTab]       = useState('overview');
-  const [basemap,         setBasemap]         = useState('minimal');
-  const [satLabels,       setSatLabels]       = useState(false);
+  const [wbView,          setWbView]          = useState(DEFAULT_WB_VIEW);
+  const wbViewRef = useRef(wbView);   // what a rebuilt map (theme change) starts from
+  const wbBase = useWbStyleBase();
   const [mapMode,         setMapMode]         = useState('countries');
   const [zonesAvailable,  setZonesAvailable]  = useState(false);
   const [corrExistOn,     setCorrExistOn]     = useState(false);
@@ -284,13 +268,15 @@ export default function RegionPage() {
 
   // Map initialisation
   useEffect(() => {
-    if (!containerRef.current || !region) return;
+    if (!containerRef.current || !region || !wbBase) return;
 
     const isos = region.countries.map(c => c.iso);
+    const tv = getT(theme);
 
+    let disposed = false;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: mapStyle(theme),
+      style: buildWbStyle(wbBase, tv, wbViewRef.current),
       center: [0, 20], zoom: 2, minZoom: 1, maxZoom: 14,
       attributionControl: false,
     });
@@ -302,9 +288,10 @@ export default function RegionPage() {
     });
 
     map.on('load', async () => {
-      const [countries, boundaries, plantsGJ, linesGJ, subsGJ, lcGJ] = await Promise.all([
-        fetchCountries('10m'),
-        fetchBoundaries('10m'),
+      const [countries, bboxes, ndlsa, plantsGJ, linesGJ, subsGJ, lcGJ] = await Promise.all([
+        fetchGeo('region', regionId),
+        fetchBboxes(),
+        fetchNdlsa(),
         fetch(dataPath(`cache/region_plants_${regionId}.geojson`)).then(r => r.json()),
         fetch(dataPath(`cache/region_lines_${regionId}.geojson`)).then(r => r.json()),
         fetch(dataPath(`cache/region_substations_${regionId}.geojson`))
@@ -313,7 +300,8 @@ export default function RegionPage() {
           .then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
       ]);
 
-      const bounds = fitBounds(isos, countries);
+      if (disposed) return;
+      const bounds = boundsFor(bboxes, 'regions', regionId, 0.5);
       if (bounds) map.fitBounds(bounds, { padding: 40, duration: 0 });
 
       // Adaptive default min-MW: cap to the ~150 largest plants, 0 if fewer.
@@ -335,14 +323,12 @@ export default function RegionPage() {
       // an empty legend row would just be a dead checkbox.
       setPresentKvs(new Set(linesGJ.features.map(f => bracketFor(f.properties.v).key)));
 
+      const hl = tv.highlight;
       addCountriesSource(map, countries);
       map.addSource('plants',       { type: 'geojson', data: plantsGJ });
       map.addSource('lines',        { type: 'geojson', data: linesGJ  });
       map.addSource('substations',  { type: 'geojson', data: subsGJ   });
       map.addSource('load-centers', { type: 'geojson', data: lcGJ     });
-
-      const tv = getT(theme);
-      addBaseLayers(map, tv, boundaries);
 
 
       // Transmission lines
@@ -356,16 +342,17 @@ export default function RegionPage() {
 
 
       // Region highlight
-      const hl = tv.highlight;
       map.addLayer({ id: 'region-fill', type: 'fill', source: 'countries',
-        filter: regionFilter(isos, region.non_determined),
+        filter: regionFilter(isos),
         paint: { 'fill-color': hl.fill,
-          'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.18, 0.08] } });
+          'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.18, 0.08] } }, fillAnchor(map));
       map.addLayer({ id: 'region-border', type: 'line', source: 'countries',
-        filter: ['in', ['get', 'ISO_A3'], ['literal', isos]],
+        filter: regionFilter(isos),
         paint: { 'line-color': hl.border, 'line-width': hl.borderW, 'line-opacity': 0.9 } });
-      addRegionCoast(map, { areas: region.non_determined, color: hl.border,
-        width: hl.borderW, opacity: 0.9 });
+      // Member countries take the highlight; a non-determined area between a
+      // member and a non-member comes out at half strength, see ndlsaFill().
+      addNdlsaLayer(map, { ndlsa, colorForIso: iso => (isos.includes(iso) ? hl.fill : null),
+        opacity: 0.08, before: fillAnchor(map), t: tv });
 
 
       // Preferred zones overlay (hidden until mapMode === 'zones')
@@ -655,25 +642,28 @@ export default function RegionPage() {
       });
 
       raiseBoundaries(map);
+      // Anything toggled while the map was still loading.
+      applyWbView(map, wbViewRef.current);
       setMapReady(true);
     });
 
-    return () => { popup.remove(); mapRef.current?.remove(); setMapReady(false); };
-  }, [region, theme]);
+    return () => {
+      disposed = true;
+      popup.remove();
+      mapRef.current?.remove();
+      mapRef.current = null;
+      setMapReady(false);
+    };
+  }, [region, theme, wbBase]);
 
   // ── Basemap switcher ─────────────────────────────────────────────────────
+  // The initial view is baked into the style; later changes are applied live.
   useEffect(() => {
+    wbViewRef.current = wbView;
     const map = mapRef.current;
-    if (!map) return;
-    swapBasemap(map, basemap, theme);
-    if (basemap !== 'satellite') toggleSatLabels(map, false, theme);
-  }, [basemap, theme]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || basemap !== 'satellite') return;
-    toggleSatLabels(map, satLabels, theme);
-  }, [satLabels, basemap, theme]);
+    if (!map || !mapReady) return;
+    applyWbView(map, wbView);
+  }, [wbView, mapReady]);
 
   // ── Zone mode / refine toggle ─────────────────────────────────────────────
   useEffect(() => {
@@ -1062,7 +1052,7 @@ export default function RegionPage() {
         plantSource={plantSource}
         gppdAvailable={gppdAvailable} gemAvailable={gemAvailable} regionId={regionId}
         presentFuels={presentFuels}
-        basemap={basemap} onBasemap={setBasemap} satLabels={satLabels} onSatLabels={setSatLabels}
+        wbView={wbView} onWbView={setWbView}
         onToggleFuel={toggleFuel} onToggleStatus={toggleStatus}
         onToggleKv={toggleKv}
         onToggleLines={toggleLines} onTogglePlants={togglePlants}

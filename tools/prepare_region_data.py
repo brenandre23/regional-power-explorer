@@ -59,14 +59,21 @@ def load_regions(only=None):
     return regions
 
 
-def load_countries_gdf():
-    with open(DATA_DIR.parent / "public" / "data" / "countries_110m.geojson", encoding="utf-8") as f:
+def load_region_countries(region_id):
+    """The region's member polygons from its detail extract. The coarse world
+    file drops islands under 0.2 deg and shifts coasts by kilometres, which
+    misplaces coastal plants and loses small-island regions entirely."""
+    path = DATA_DIR.parent / "public" / "data" / "geo" / "region" / f"{region_id}.geojson"
+    if not path.exists():
+        print(f"  {path.name} not found -- run tools/prepare_gad.py first")
+        return []
+    with open(path, encoding="utf-8") as f:
         gj = json.load(f)
     rows, repaired = [], 0
     for feat in gj["features"]:
         p = feat["properties"]
         # Skip the areas the Bank does not attribute to a country; they carry no
-        # code and belong to no region. See tools/prepare_boundaries.py.
+        # code and belong to no region. See tools/prepare_gad.py.
         if p.get("STATUS") == "non-determined":
             continue
         iso = p.get("ISO_A3") or ""
@@ -404,13 +411,11 @@ if __name__ == "__main__":
         print(f"ERROR: worldwide.gpkg not found at {GPKG}")
         raise SystemExit(1)
 
-    regions       = load_regions(only=set(args.regions) if args.regions else None)
-    countries_all = load_countries_gdf()
+    regions = load_regions(only=set(args.regions) if args.regions else None)
 
     for region in regions:
         print(f"\n=== {region['name']} ({region['id']}) ===")
-        iso_set          = {c["iso"] for c in region["countries"]}
-        region_countries = [c for c in countries_all if c["ISO_A3"] in iso_set]
+        region_countries = load_region_countries(region["id"])
         if not region_countries:
             print("  No matching countries, skipping")
             continue

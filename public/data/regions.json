@@ -148,7 +148,10 @@
   {
    "id": "eapp",
    "epm": true,
-   "non_determined": ["Abyei"],
+   "non_determined": [
+    "Abyei",
+    "Ilemi Triangle"
+   ],
    "name": "Eastern Africa Power Pool",
    "status": "available",
    "color": "#1AA8B0",
@@ -270,7 +273,10 @@
   },
   {
    "id": "easa",
-   "non_determined": ["Abyei"],
+   "non_determined": [
+    "Abyei",
+    "Ilemi Triangle"
+   ],
    "name": "EA & SA Pools",
    "status": "available",
    "color": "#5A6FC0",
@@ -375,7 +381,12 @@
   },
   {
    "id": "panarab",
-   "non_determined": ["Western Sahara"],
+   "non_determined": [
+    "Golan Heights",
+    "No Man's Land",
+    "Shebaa Farms Dispute",
+    "Western Sahara"
+   ],
    "name": "Pan-Arab",
    "status": "available",
    "color": "#C4A020",
@@ -484,7 +495,21 @@
   },
   {
    "id": "southasia",
-   "non_determined": ["Arunchal Pradesh", "Disputed Area: IND/PAK"],
+   "non_determined": [
+    "Aksai Chin",
+    "Arunachal Pradesh",
+    "Chumar East",
+    "Chumar West",
+    "Demchok",
+    "Doklam",
+    "Jadh Ganga Valley",
+    "Jammu and Kashmir",
+    "Kalapani",
+    "Karakoram Range",
+    "Kauirik",
+    "Lapthal",
+    "Shipki Pass"
+   ],
    "name": "South Asia",
    "status": "available",
    "color": "#1A8AAA",
@@ -586,6 +611,9 @@
      "iso": "PAK",
      "name": "Pakistan"
     }
+   ],
+   "non_determined": [
+    "Jammu and Kashmir"
    ]
   },
   {
@@ -670,7 +698,9 @@
   },
   {
    "id": "eu",
-   "non_determined": ["UN Buffer Zone in Cyprus"],
+   "non_determined": [
+    "UN Buffer Zone"
+   ],
    "name": "European Union",
    "status": "available",
    "color": "#4870C0",
@@ -1143,6 +1173,9 @@
      "iso": "BHR",
      "name": "Bahrain"
     }
+   ],
+   "non_determined": [
+    "British Indian Ocean Territory"
    ]
   }
  ]

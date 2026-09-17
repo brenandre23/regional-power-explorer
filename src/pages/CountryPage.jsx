@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { track } from '../analytics';
 import maplibregl from 'maplibre-gl';
 import { useTheme } from '../App';
-import { getT, mapStyle, swapBasemap, toggleSatLabels, FUEL_COLORS, VOLTAGE_BRACKETS, kvFilterWithFloor, bracketFor, LINE_ATTR_LABELS, lineAttrText, linePopupHTML, visibleLineFeatures, linesToCSV, linesToDownloadGeoJSON, plantRadiusExpr, lcRadiusExpr, adaptiveMinMw, defaultNZones, PANEL_WIDTH_MIN, PANEL_WIDTH_DEFAULT, PANEL_WIDTH_MAX, BRIEFS_ENABLED } from '../constants';
+import { getT, FUEL_COLORS, VOLTAGE_BRACKETS, kvFilterWithFloor, bracketFor, LINE_ATTR_LABELS, lineAttrText, linePopupHTML, visibleLineFeatures, linesToCSV, linesToDownloadGeoJSON, plantRadiusExpr, lcRadiusExpr, adaptiveMinMw, defaultNZones, PANEL_WIDTH_MIN, PANEL_WIDTH_DEFAULT, PANEL_WIDTH_MAX, BRIEFS_ENABLED } from '../constants';
 import LayerPanel from '../components/LayerPanel';
 import CountryOverview from '../components/CountryOverview';
 import REResourcesTab from '../components/tabs/REResourcesTab';
@@ -12,7 +12,8 @@ import LoadTab from '../components/tabs/LoadTab';
 import ZoningTab from '../components/tabs/ZoningTab';
 import SupplyTab from '../components/tabs/SupplyTab';
 import MarketTab from '../components/tabs/MarketTab';
-import { fetchCountries, fetchBoundaries, addCountriesSource, addBaseLayers, raiseBoundaries } from '../utils/basemap';
+import { buildWbStyle, applyWbView, useWbStyleBase, DEFAULT_WB_VIEW } from '../utils/wbStyle';
+import { fetchGeo, fetchBboxes, fetchNdlsa, boundsFor, addCountriesSource, addNdlsaLayer, raiseBoundaries, fillAnchor } from '../utils/basemap';
 
 // Same Google Apps Script web-app as ContactPage (writes to the shared Sheet).
 // Brief-edit suggestions are tagged type='brief-edit' and routed to a "Brief Edits" tab.
@@ -89,24 +90,6 @@ function pointInFeature(pt, feature) {
   return false;
 }
 
-function fitBoundsCountry(iso, countries) {
-  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
-  for (const f of countries.features) {
-    if (f.properties.ISO_A3 !== iso) continue;
-    const geom = f.geometry;
-    const rings = geom.type === 'Polygon'
-      ? geom.coordinates
-      : geom.coordinates.flatMap(p => p);
-    for (const ring of rings)
-      for (const [lon, lat] of ring) {
-        if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
-        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-      }
-  }
-  if (!isFinite(minLon)) return null;
-  return [[minLon - 0.8, minLat - 0.8], [maxLon + 0.8, maxLat + 0.8]];
-}
-
 export default function CountryPage() {
   const { iso }      = useParams();
   const { theme }    = useTheme();
@@ -145,8 +128,9 @@ export default function CountryPage() {
   const isDrRef   = useRef(false);
   const drStartX  = useRef(0);
   const drStartW  = useRef(0);
-  const [basemap,            setBasemap]            = useState('minimal');
-  const [satLabels,          setSatLabels]          = useState(false);
+  const [wbView,             setWbView]             = useState(DEFAULT_WB_VIEW);
+  const wbViewRef = useRef(wbView);   // what a rebuilt map (theme change) starts from
+  const wbBase = useWbStyleBase();
   const [loadCentersOn,      setLoadCentersOn]      = useState(true);
   const [lcMinPop,           setLcMinPop]           = useState(300_000);
   const [lcCircleScale,      setLcCircleScale]      = useState(1.0);
@@ -294,12 +278,14 @@ export default function CountryPage() {
   }, [iso]);
 
   useEffect(() => {
-    if (!containerRef.current || !info) return;
+    if (!containerRef.current || !info || !wbBase) return;
     const { region } = info;
+    const tv = getT(theme);
 
+    let disposed = false;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: mapStyle(theme),
+      style: buildWbStyle(wbBase, tv, wbViewRef.current),
       center: [0, 20], zoom: 2,
       minZoom: 1, maxZoom: 16,
       attributionControl: false,
@@ -312,9 +298,10 @@ export default function CountryPage() {
     });
 
     map.on('load', async () => {
-      const [countries, boundaries, plantsGJ, linesGJ, subsGJ, lcGJ, admin1GJ] = await Promise.all([
-        fetchCountries('10m'),
-        fetchBoundaries('10m'),
+      const [countries, bboxes, ndlsa, plantsGJ, linesGJ, subsGJ, lcGJ, admin1GJ] = await Promise.all([
+        fetchGeo('country', iso),
+        fetchBboxes(),
+        fetchNdlsa(),
         fetch(dataPath(`cache/region_plants_${region.id}.geojson`)).then(r => r.json()),
         fetch(dataPath(`cache/region_lines_${region.id}.geojson`)).then(r => r.json()),
         fetch(dataPath(`cache/region_substations_${region.id}.geojson`)).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] })),
@@ -322,7 +309,8 @@ export default function CountryPage() {
         fetch(dataPath(`cache/region_admin1_${region.id}.geojson`)).then(r => r.ok ? r.json() : { type: 'FeatureCollection', features: [] }).catch(() => ({ type: 'FeatureCollection', features: [] })),
       ]);
 
-      const bounds = fitBoundsCountry(iso, countries);
+      if (disposed) return;
+      const bounds = boundsFor(bboxes, 'countries', iso, 0.8);
       if (bounds) {
         map.fitBounds(bounds, { padding: 60, duration: 0, maxZoom: 9 });
         setCountryCenter({
@@ -402,9 +390,6 @@ export default function CountryPage() {
       map.addSource('zone-centroids-src', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addSource('zone-outside',       { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
 
-      const tv = getT(theme);
-
-      addBaseLayers(map, tv, boundaries);
 
       // Transmission lines
       for (const bracket of VOLTAGE_BRACKETS) {
@@ -429,7 +414,11 @@ export default function CountryPage() {
         source: 'countries',
         filter: hlFilter,
         paint: { 'fill-color': hl.fill, 'fill-opacity': 0.08 },
-      });
+      }, fillAnchor(map));
+      // The country takes the highlight; a non-determined area it is party to
+      // comes out at half strength, see ndlsaFill(). Outlines come from the basemap.
+      addNdlsaLayer(map, { ndlsa, colorForIso: c => (c === iso ? hl.fill : null),
+        opacity: 0.08, before: fillAnchor(map), t: tv });
 
       // Admin-1 province/state boundaries (shown in 'admin' zone mode)
       map.addLayer({
@@ -734,24 +723,27 @@ export default function CountryPage() {
       mapReadyRef.current = true;
 
       raiseBoundaries(map);
+      // Anything toggled while the map was still loading.
+      applyWbView(map, wbViewRef.current);
     });
 
-    return () => { mapReadyRef.current = false; popup.remove(); mapRef.current?.remove(); };
-  }, [info, theme]);
+    return () => {
+      disposed = true;
+      mapReadyRef.current = false;
+      popup.remove();
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [info, theme, wbBase]);
 
   // ── Basemap switcher ─────────────────────────────────────────────────────
+  // The initial view is baked into the style; later changes are applied live.
   useEffect(() => {
+    wbViewRef.current = wbView;
     const map = mapRef.current;
-    if (!map) return;
-    swapBasemap(map, basemap, theme);
-    if (basemap !== 'satellite') toggleSatLabels(map, false, theme);
-  }, [basemap, theme]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || basemap !== 'satellite') return;
-    toggleSatLabels(map, satLabels, theme);
-  }, [satLabels, basemap, theme]);
+    if (!map || !mapReadyRef.current) return;
+    applyWbView(map, wbView);
+  }, [wbView]);
 
   // ── Layer toggle handlers ────────────────────────────────────────────────
 
@@ -1160,7 +1152,7 @@ export default function CountryPage() {
         minMw={minMw} circleScale={circleScale}
         plantSource={plantSource} gppdAvailable={gppdAvailable} gemAvailable={gemAvailable} regionId={region.id} iso={iso}
         presentFuels={presentFuels}
-        basemap={basemap} onBasemap={setBasemap} satLabels={satLabels} onSatLabels={setSatLabels}
+        wbView={wbView} onWbView={setWbView}
         onToggleFuel={toggleFuel} onToggleStatus={toggleStatus} onToggleKv={toggleKv}
         onToggleLines={toggleLines} onTogglePlants={togglePlants}
         onToggleSubs={toggleSubs}

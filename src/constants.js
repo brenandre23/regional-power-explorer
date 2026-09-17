@@ -1,3 +1,5 @@
+import { mix } from './utils/color';
+
 export const FUEL_COLORS = {
   solar:      '#FFD700',
   wind:       '#44DAEC',
@@ -243,55 +245,15 @@ export const WB_BASEMAP_STYLE_URL =
   'https://www.arcgis.com/sharing/rest/content/items/dcc1c1c0f97f4e458199888b0fc63896/resources/styles/root.json';
 
 // The first World Bank political-boundary layer in the approved vector style.
-// Area fills that need to sit under the Bank boundary treatment can be inserted
-// before this layer. Operational infrastructure can remain above the base map;
-// raiseBoundaries() in utils/basemap.js then lifts WB boundaries and labels back
-// above the overlays.
+// Anything that must sit under the Bank's boundary treatment (satellite
+// imagery) is inserted before this layer; see src/utils/wbStyle.js.
 export const WB_BOUNDARY_ANCHOR = 'Global Administrative Divisions/ADM0_Boundaries/Dotted';
 
-export function mapStyle() {
-  // Use the World Bank vector style directly. This keeps disputed-area line
-  // patterns, country naming, administrative labels, glyphs and sprites under
-  // one authoritative cartographic source instead of recreating them in-app.
-  return WB_BASEMAP_STYLE_URL;
-}
-
-const WB_LABEL_SOURCES = new Set(['esri', 'country_names', 'wbg_admin_labels', 'wbg_places']);
-
-function setReferenceLabelsVisible(map, visible) {
-  if (!map?.isStyleLoaded()) return;
-  for (const layer of map.getStyle().layers || []) {
-    if (layer.type !== 'symbol') continue;
-    if (!WB_LABEL_SOURCES.has(layer.source)) continue;
-    try { map.setLayoutProperty(layer.id, 'visibility', visible ? 'visible' : 'none'); } catch { /* style race */ }
-  }
-}
-
-export function swapBasemap(map, basemap) {
-  if (!map?.isStyleLoaded()) return;
-  if (map.getLayer('satellite-imagery')) map.removeLayer('satellite-imagery');
-  if (map.getSource('satellite-imagery-src')) map.removeSource('satellite-imagery-src');
-
-  if (basemap === 'satellite') {
-    map.addSource('satellite-imagery-src', {
-      type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-      tileSize: 256,
-      attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics',
-    });
-    // Put imagery beneath the World Bank boundary stack so dispute treatment is
-    // never replaced by imagery or by an alternate provider's political lines.
-    const before = map.getLayer(WB_BOUNDARY_ANCHOR) ? WB_BOUNDARY_ANCHOR : undefined;
-    map.addLayer({ id: 'satellite-imagery', type: 'raster', source: 'satellite-imagery-src' }, before);
-    setReferenceLabelsVisible(map, false);
-  } else {
-    setReferenceLabelsVisible(map, basemap === 'labeled');
-  }
-}
-
-export function toggleSatLabels(map, show) {
-  if (!map?.isStyleLoaded()) return;
-  setReferenceLabelsVisible(map, !!show);
+// Non-determined area fills are policy, kept with the claimants in
+// public/data/ndlsa.json; see ndlsaFill() in src/utils/basemap.js.
+/** Fill for an area none of whose parties the page colours: a quiet grey off the land. */
+export function ndlsaNeutralFill(t) {
+  return mix(t.land, t.text, 0.22);
 }
 
 // Right-side detail panel (region + country pages) — draggable. Opens at

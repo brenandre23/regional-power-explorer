@@ -1,0 +1,168 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>NDLSA preview — South Asia</title>
+<link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<style>
+  html,body{margin:0;height:100%;font:12px system-ui,sans-serif}
+  #map{position:absolute;inset:0}
+  #legend{position:absolute;left:12px;bottom:12px;background:#fff;padding:10px 12px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.2);line-height:1.7}
+  #legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border:1px solid #999}
+  #info{position:absolute;right:12px;top:12px;background:#fff;padding:8px 10px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.2);min-width:180px}
+</style></head><body>
+<div id="map"></div>
+<div id="legend"></div>
+<div id="info">Hover an area</div>
+<script>
+// Preview only: WB approved style + per-country fills + NDLSA fills derived
+// from the claimants' colours (midpoint), matching ndlsaFill() in the app.
+//
+// Geometry is fetched live from the GAD service, generalised at the
+// pipeline's normal detail tolerance (tools/prepare_gad.py DETAIL_TOLERANCE),
+// instead of reading the pre-generalised public/data/geo files -- so this
+// preview matches the resolution the shipped app actually ships.
+//
+// Full resolution (maxAllowableOffset omitted) was tried first and rejected:
+// India's mainland ring came back at ~39,000 points, which is dense enough
+// that MapLibre's earcut fill triangulator produced a spurious diagonal band
+// cutting across the interior (verified against a plain matplotlib render of
+// the same raw ring, which was clean -- the defect is in triangulating that
+// much detail, not in the source data). 0.001 deg (~26,000 points) was tried
+// next; this settles on the app's own 0.002 deg tolerance (~16,000 points for
+// India), the resolution the shipped app actually renders without issue.
+const TOLERANCE = 0.002;
+const STYLE = 'https://www.arcgis.com/sharing/rest/content/items/dcc1c1c0f97f4e458199888b0fc63896/resources/styles/root.json';
+const GAD_SERVICE = 'https://services.arcgis.com/iQ1dY19aHwbSDYIF/arcgis/rest/services/' +
+  'World_Bank_Global_Administrative_Divisions/FeatureServer/4/query';
+const COLORS = { IND:'#1A8AAA', CHN:'#C0504D', PAK:'#6A5AA8', NPL:'#3A9040', BTN:'#C4A020',
+                 BGD:'#2A88C8', LKA:'#0E9B8A', AFG:'#C47C2A', MMR:'#8A7A64' };
+const NEUTRAL = '#9a9a9a';
+const RULES = { 'golan-heights':{hatch:true}, 'western-sahara':{color:'#D0965A'},
+                'falkland-islands':{neutral:true}, 'south-georgia-and-south-sandwich-islands':{neutral:true} };
+// Same table as CLAIMANTS in tools/prepare_gad.py, restricted to the areas
+// that can appear on this page (South Asia members plus CHN/MMR context).
+const CLAIMANTS = {
+  'Aksai Chin': ['IND','CHN'], 'Arunachal Pradesh': ['IND','CHN'], 'Chumar East': ['IND','CHN'],
+  'Chumar West': ['IND','CHN'], 'Demchok': ['IND','CHN'], 'Jadh Ganga Valley': ['IND','CHN'],
+  'Kauirik': ['IND','CHN'], 'Lapthal': ['IND','CHN'], 'Shipki Pass': ['IND','CHN'],
+  'Karakoram Range': ['IND','CHN'], 'Jammu and Kashmir': ['IND','PAK'], 'Doklam': ['BTN','CHN'],
+  'Kalapani': ['NPL','IND'],
+};
+const NDLSA_STATUS = 'Non-determined legal status area';
+const slug = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+async function fetchGad(where) {
+  const params = new URLSearchParams({
+    where, outFields: 'ISO_A3,WB_STATUS,SOV_ISO_A3,NAM_0', f: 'geojson', outSR: 4326,
+    maxAllowableOffset: TOLERANCE,
+  });
+  const fc = await fetch(GAD_SERVICE + '?' + params).then(r => r.json());
+  for (const f of fc.features) {
+    const p = f.properties;
+    if (p.WB_STATUS === NDLSA_STATUS) {
+      p.STATUS = 'non-determined';
+      p.AREA_ID = slug(p.NAM_0) + (p.SOV_ISO_A3 ? `-${p.SOV_ISO_A3.toLowerCase()}` : '');
+      p.CLAIMANTS = (CLAIMANTS[p.NAM_0] || []).join(',');
+      if (p.SOV_ISO_A3) p.ADMIN = p.SOV_ISO_A3;
+      p.ISO_A3 = '';
+    }
+    p.WB_NAME = p.NAM_0;
+  }
+  return fc.features;
+}
+
+const hex = c => c.match(/\w\w/g).map(h => parseInt(h,16));
+const avg = cs => '#' + [0,1,2].map(i => Math.round(cs.reduce((s,c)=>s+hex(c)[i],0)/cs.length).toString(16).padStart(2,'0')).join('');
+function ndlsaFill(p) {
+  const rule = RULES[p.AREA_ID] || RULES[p.AREA_ID.replace(/-[a-z]{3}$/,'')];
+  if (rule?.hatch) return { color: NEUTRAL, alpha: 1, hatch: true };
+  if (rule?.color) return { color: rule.color, alpha: 1 };
+  const cl = p.CLAIMANTS.split(','), cs = rule?.neutral ? [] : cl.map(i => COLORS[i]).filter(Boolean);
+  return cs.length ? { color: avg(cs), alpha: cs.length / cl.length } : { color: NEUTRAL, alpha: 1 };
+}
+
+(async () => {
+  const style = await (await fetch(STYLE)).json();
+  // Same boundary treatment as src/utils/wbStyle.js, light theme.
+  for (const l of style.layers) {
+    if (l.source !== 'wbg_borders' || l['source-layer'] !== 'ADM0_Boundaries') continue;
+    l.paint = { ...l.paint };
+    if (l.id.endsWith('/Dashed Cutout')) l.layout = { ...l.layout, visibility: 'none' };
+    else {
+      l.paint['line-color'] = '#6a7280';
+      if (l.id.endsWith('/Dashed Solid Line')) l.paint['line-dasharray'] = [5, 7];
+      if (l.id.endsWith('/Solid')) l.paint['line-width'] = { stops: [[1,.65],[7,1.1],[10,1.4],[14,2]] };
+    }
+  }
+  style.sources.wbg_places = { ...style.sources.wbg_places, minzoom: 0 };
+
+  const q = new URLSearchParams(location.search); const map = new maplibregl.Map({ container: 'map', style, center: q.get('c') ? q.get('c').split(',').map(Number) : [82, 29], zoom: +(q.get('z') || 4.3) });
+  map.on('load', async () => {
+    const isos = ['IND','PAK','BGD','LKA','NPL','BTN','AFG','MDV','CHN','MMR'];
+    const areaNames = Object.keys(CLAIMANTS);
+    const isoWhere = isos.map(i => `'${i}'`).join(',');
+    const areaWhere = areaNames.map(n => `'${n.replace(/'/g, "''")}'`).join(',');
+    const [countries, areas] = await Promise.all([
+      fetchGad(`ISO_A3 IN (${isoWhere})`),
+      fetchGad(`WB_STATUS = '${NDLSA_STATUS}' AND NAM_0 IN (${areaWhere})`),
+    ]);
+    const fc = { type: 'FeatureCollection', features: [...countries, ...areas] };
+    // Re-assign ids: the countries and areas queries each restart from the
+    // service's own OBJECTIDs, so the two lists can collide. MapLibre needs a
+    // unique id per feature for setFeatureState. Same approach as fetchGeo()
+    // in src/utils/basemap.js.
+    fc.features.forEach((f, i) => { f.id = i; });
+    for (const f of fc.features) {
+      const p = f.properties;
+      if (p.STATUS === 'non-determined') Object.assign(p, ndlsaFill(p));
+      else p.color = COLORS[p.ISO_A3] || 'transparent';
+    }
+    map.addSource('geo', { type: 'geojson', data: fc, generateId: false });
+    const c = document.createElement('canvas'); c.width = c.height = 16;
+    const ctx = c.getContext('2d'); ctx.strokeStyle = 'rgba(90,95,105,.6)'; ctx.lineWidth = 2;
+    for (let d = -16; d <= 32; d += 6) { ctx.beginPath(); ctx.moveTo(d,0); ctx.lineTo(d+16,16); ctx.stroke(); }
+    map.addImage('hatch', ctx.getImageData(0,0,16,16), { pixelRatio: 2 });
+
+    // Hover bumps opacity via feature-state, same pattern as region-fill /
+    // ndlsa-fill in src/pages/WorldPage.jsx and src/utils/basemap.js.
+    const HOVER = ['boolean', ['feature-state', 'hover'], false];
+    const ls = map.getStyle().layers; const before = ls[ls.findIndex(l => l.id === 'Land') + 1].id;
+    map.addLayer({ id: 'countries', type: 'fill', source: 'geo', filter: ['!=', ['get','STATUS'], 'non-determined'],
+      paint: { 'fill-color': ['get','color'], 'fill-opacity': ['case', HOVER, 0.6, 0.35] } }, before);
+    map.addLayer({ id: 'ndlsa', type: 'fill', source: 'geo', filter: ['all', ['==', ['get','STATUS'], 'non-determined'], ['!', ['to-boolean', ['get','hatch']]]],
+      paint: { 'fill-color': ['get','color'], 'fill-opacity': ['*', ['get','alpha'], ['case', HOVER, 0.6, 0.35]] } }, before);
+    map.addLayer({ id: 'ndlsa-hatch', type: 'fill', source: 'geo', filter: ['all', ['==', ['get','STATUS'], 'non-determined'], ['to-boolean', ['get','hatch']]],
+      paint: { 'fill-pattern': 'hatch', 'fill-opacity': ['case', HOVER, 1, 0.7] } }, before);
+
+    document.getElementById('legend').innerHTML =
+      Object.entries(COLORS).map(([k,v]) => `<div><i style="background:${v};opacity:.5"></i>${k}</div>`).join('') +
+      `<div><i style="background:${NEUTRAL};opacity:.5"></i>no coloured party</div><div>Areas between two parties take the midpoint; one party coloured → half strength</div>`;
+
+    const info = document.getElementById('info');
+    const hoverLayers = ['countries', 'ndlsa', 'ndlsa-hatch'];
+    const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 });
+    const infoHTML = p => p.STATUS === 'non-determined'
+      ? `<b>${p.WB_NAME}</b><br>non-determined · parties: ${p.CLAIMANTS}${p.ADMIN ? ' · admin ' + p.ADMIN : ''}<br>fill ${p.color} × ${(+p.alpha).toFixed(2)}${p.hatch ? ' (hatch)' : ''}`
+      : `<b>${p.WB_NAME}</b> (${p.ISO_A3})`;
+
+    let hoveredId = null;
+    map.on('mousemove', hoverLayers, e => {
+      map.getCanvas().style.cursor = 'pointer';
+      if (hoveredId !== null) map.setFeatureState({ source: 'geo', id: hoveredId }, { hover: false });
+      hoveredId = e.features[0].id;
+      map.setFeatureState({ source: 'geo', id: hoveredId }, { hover: true });
+
+      const p = e.features[0].properties;
+      info.innerHTML = infoHTML(p);
+      popup.setLngLat(e.lngLat).setHTML(infoHTML(p)).addTo(map);
+    });
+    map.on('mouseleave', hoverLayers, () => {
+      map.getCanvas().style.cursor = '';
+      if (hoveredId !== null) map.setFeatureState({ source: 'geo', id: hoveredId }, { hover: false });
+      hoveredId = null;
+      info.innerHTML = 'Hover an area';
+      popup.remove();
+    });
+  });
+})();
+</script>
+</body></html>
