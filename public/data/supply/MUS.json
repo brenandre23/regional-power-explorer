@@ -1,9 +1,8 @@
 {
   "country": "Mauritius",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,20 @@
         1140.0,
         1250.0,
         980.0,
-        1100.0
+        1100.0,
+        1340.0
+      ],
+      "Oil & Other Fossil": [
+        1130.0,
+        1110.0,
+        1180.0,
+        1220.0,
+        1360.0,
+        1060.0,
+        1100.0,
+        1530.0,
+        1600.0,
+        1460.0
       ],
       "Hydro": [
         120.0,
@@ -36,7 +49,8 @@
         120.0,
         110.0,
         130.0,
-        90.0
+        90.0,
+        110.0
       ],
       "Solar": [
         30.0,
@@ -47,7 +61,8 @@
         150.0,
         150.0,
         160.0,
-        150.0
+        150.0,
+        170.0
       ],
       "Wind": [
         0.0,
@@ -58,18 +73,8 @@
         20.0,
         10.0,
         20.0,
+        10.0,
         10.0
-      ],
-      "Oil": [
-        1130.0,
-        1110.0,
-        1180.0,
-        1220.0,
-        1360.0,
-        1060.0,
-        1100.0,
-        1530.0,
-        1600.0
       ],
       "Bioenergy": [
         530.0,
@@ -80,20 +85,11 @@
         410.0,
         370.0,
         300.0,
-        320.0
-      ],
-      "Other Renewables": [
-        530.0,
-        520.0,
-        480.0,
-        460.0,
-        460.0,
-        410.0,
-        370.0,
-        300.0,
+        320.0,
         320.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       2990.0,
       3050.0,
@@ -103,7 +99,8 @@
       2900.0,
       2990.0,
       3120.0,
-      3270.0
+      3270.0,
+      3410.0
     ]
   },
   "capacity": {
@@ -118,7 +115,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -130,12 +128,14 @@
         190.0,
         190.0,
         190.0,
+        190.0,
         190.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         440.0,
         460.0,
         530.0,
+        460.0,
         460.0,
         460.0,
         460.0,
@@ -152,18 +152,20 @@
         60.0,
         60.0,
         60.0,
+        60.0,
         60.0
       ],
       "Solar": [
         20.0,
+        20.0,
         30.0,
-        30.0,
-        80.0,
+        70.0,
         100.0,
         110.0,
         110.0,
         110.0,
-        130.0
+        130.0,
+        160.0
       ],
       "Wind": [
         0.0,
@@ -174,9 +176,11 @@
         10.0,
         10.0,
         10.0,
+        10.0,
         10.0
       ],
       "Bioenergy": [
+        90.0,
         90.0,
         90.0,
         90.0,

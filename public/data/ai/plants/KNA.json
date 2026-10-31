@@ -1,0 +1,1 @@
+{"gem":{"byStatus":{"construction":{"solar":[38.0,1]},"planned":{"wind":[6.6,1],"geothermal":[40.0,2]},"operating":{"wind":[2.2,1]}},"top":[["Nevis geothermal power plant","geothermal",40.0,"planned",2],["Basseterre Valley solar farm","solar",38.0,"construction",1],["Belle Vue wind farm","wind",6.6,"planned",1],["Maddens wind farm","wind",2.2,"operating",1]]}}

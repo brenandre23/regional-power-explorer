@@ -13,78 +13,9 @@
     <link rel="preconnect" href="https://vectortileservices.arcgis.com" crossorigin />
     <link rel="preload" as="fetch" crossorigin="anonymous"
           href="https://www.arcgis.com/sharing/rest/content/items/dcc1c1c0f97f4e458199888b0fc63896/resources/styles/root.json" />
-    <style>
-      /* Welcome screen: plain HTML and CSS so it shows at once, before the app's
-         code has downloaded, and the map loads behind it. See the script below. */
-      #rpe-welcome { position: fixed; inset: 0; z-index: 1000; display: flex;
-        align-items: center; justify-content: center; padding: 16px;
-        background: rgba(42, 34, 24, 0.35);
-        font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
-      #rpe-welcome[hidden] { display: none; }
-      #rpe-welcome .card { width: 100%; max-width: 460px; box-sizing: border-box;
-        background: #FBF8F2; border: 1px solid #DDD5C4; border-radius: 10px;
-        padding: 24px 26px 22px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); color: #2A2218; }
-      #rpe-welcome h1 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 700; }
-      #rpe-welcome .tagline { margin: 0 0 14px; font-size: 0.85rem; color: #8A7A64; }
-      #rpe-welcome p { margin: 0 0 12px; font-size: 0.85rem; line-height: 1.5; }
-      #rpe-welcome .disclaimer { margin: 4px 0 18px; font-size: 0.7rem; line-height: 1.45;
-        color: #8A7A64; font-style: italic; }
-      #rpe-welcome button { width: 100%; padding: 10px 14px; border: none; border-radius: 6px;
-        font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-        color: #FBF8F2; background: #2A2218; }
-      #rpe-welcome button:disabled { cursor: progress; opacity: 0.75; }
-    </style>
   </head>
   <body>
     <div id="root"></div>
-    <div id="rpe-welcome" role="dialog" aria-modal="true" aria-labelledby="rpe-welcome-title" hidden>
-      <div class="card">
-        <h1 id="rpe-welcome-title">Regional Power Explorer</h1>
-        <p class="tagline">An energy dashboard for regional power pools</p>
-        <p>Explore generation capacity, transmission lines, cross-border trade and
-          planning zones across regional power pools.</p>
-        <p><strong>Click a region</strong> on the map to open it, then a country for details.
-          Switch plant sources, filter by fuel or voltage, and download what you see.</p>
-        <p class="disclaimer">The boundaries, colors, denominations and other information shown
-          on this map do not imply any judgment on the part of the World Bank concerning the
-          legal status of any territory or the endorsement or acceptance of such boundaries.</p>
-        <button id="rpe-welcome-enter" type="button">Enter the map</button>
-      </div>
-    </div>
-    <script>
-      // Shown on every visit to the home page (direct links to a region or country
-      // skip it), while the app's code, the basemap and the colours load behind.
-      // "Enter" clicked before the colours are drawn waits for them, so nobody
-      // lands on a half-drawn map; after 15 s it lets the visitor in regardless.
-      (function () {
-        var el = document.getElementById('rpe-welcome');
-        var btn = document.getElementById('rpe-welcome-enter');
-        var ready = false, waiting = false, timer = null;
-        function close() { clearTimeout(timer); waiting = false; el.hidden = true; }
-        function enter() {
-          if (ready) return close();
-          waiting = true;
-          btn.disabled = true;
-          btn.textContent = 'Loading map\u2026';
-          timer = setTimeout(close, 15000);
-        }
-        btn.addEventListener('click', enter);
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' && !el.hidden && !waiting) enter();
-        });
-        window.rpeWelcome = {
-          // Called by the world map once its colours are on screen.
-          mapReady: function () { ready = true; if (waiting) close(); },
-          // "About this map" brings it back.
-          show: function () {
-            btn.disabled = false; btn.textContent = 'Enter the map';
-            el.hidden = false; btn.focus();
-          },
-        };
-        var h = location.hash;
-        if (!h || h === '#' || h === '#/') { el.hidden = false; btn.focus(); }
-      })();
-    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

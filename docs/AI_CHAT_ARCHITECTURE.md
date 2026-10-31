@@ -28,6 +28,31 @@ Keep current preprocessed static delivery for the first integrated release. Move
 
 Read compact static JSON summaries. Never send whole regional GeoJSON to the model. Use the package's live MapLibre tool server for viewport/layer questions and the Explorer's own static JSON for quantitative questions.
 
+The region plant and line files are too big to read per question, so `tools/prepare_ai.py` summarises them into `public/data/ai/` (about 2 MB in all). Run it after any pipeline step that rewrites the region plant, line or zone files. CI fails a pull request whose summaries are out of date (see `DATA_LINEAGE.md`).
+
+The files each data tool reads (`src/chat/dataServer.js`, prefixed `data__` for the model). What each tool is for, the prompt and the design rules: `AI_ASSISTANT.md`.
+
+| Tool | Reads | Answers |
+|---|---|---|
+| `regions` | `regions.json` | regions and their member countries |
+| `coverage` | build file list, `metadata.json` | what is published for a country, and when data was last updated |
+| `methodology` | `methodology.md` | sources, definitions and limits of each dataset |
+| `capacity` | `cache/region_capacity_*.json`, `cache/region_age_*_gppd.json` | operating MW by fuel and country for a region; GPPD fleet age |
+| `pipeline` | `ai/plants/<ISO3>.json` | GEM planned and under-construction MW by fuel, for a country or region |
+| `plants` | `ai/plants/<ISO3>.json` | largest plants by dataset, fuel and status |
+| `supply` | `supply/<ISO3>.json` | generation and capacity by fuel and year, demand, peak demand (up to 10 countries) |
+| `trade` | `trade/<ISO3>.json` | net imports and flows by partner and year, with known-problem caveats |
+| `indicators` | `access.json`, `tariffs.json` | access (total, urban, rural) and residential/industrial tariffs |
+| `grid` | `ai/grid/<region>.json` | region line km by voltage class, top operators, substations |
+| `market` | `market/<ISO3>.json` | wholesale prices and volumes, yearly and monthly (Türkiye) |
+| `zones` | `ai/zones/<ISO3>.json` | planning-model zones: plants by fuel per zone, connected zones |
+| `load_centres` | `region_load_centers_<region>.geojson` | main cities by population (Black Sea) |
+| `country_note` | `notes/<ISO3>.html` | the AI-drafted briefing note: figures, outline, takeaways or one section |
+| `re_resources` | `re/<ISO3>.json` | country solar and wind resource: averages, best 10%, monthly profiles |
+| `fuel_detail` | `entsoe/<ISO3>.json` + `supply/<ISO3>.json` | ENTSO-E's finer hydro, coal and wind split (harmonised statistics) for European countries, with how complete it is |
+
+`public/data/re/` is written by `tools/prepare_re.py` from Global Solar Atlas country statistics, Global Wind Atlas v4 and NASA POWER. The RE tab reads the same files, so neither the tab nor the assistant calls an outside service. The method is in `RE_RESOURCES_METHOD.md`.
+
 ## AI trust boundary
 
 Browser:

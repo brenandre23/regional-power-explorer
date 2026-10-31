@@ -23,7 +23,9 @@ but it is a **standalone data-exploration tool** and is not limited to EPM.
 All layers, their sources, versions, update frequency, coverage, and a quality indicator are
 documented in the in-app **Data Sources** page (`/about`). Key sources include ENTSO-E,
 OpenStreetMap, the WRI Global Power Plant Database, Global Energy Monitor, the Global Solar
-Atlas, ERA5, Our World in Data, Ember, and national statistical offices.
+Atlas, the Global Wind Atlas, NASA POWER, Our World in Data, Ember, and national statistical
+offices. Where each file comes from and how often it is refreshed is in
+[docs/DATA_LINEAGE.md](docs/DATA_LINEAGE.md).
 
 Data licences include: OpenStreetMap (ODbL), WRI GPPD (CC BY 4.0), Global Energy Monitor
 (CC BY 4.0), World Bank Official Boundaries (CC BY 4.0), and others as listed on the Data Sources page.

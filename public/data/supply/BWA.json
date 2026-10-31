@@ -1,9 +1,8 @@
 {
   "country": "Botswana",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,20 @@
         2120.0,
         2390.0,
         2450.0,
-        3190.0
+        3190.0,
+        3370.0
+      ],
+      "Oil & Other Fossil": [
+        110.0,
+        10.0,
+        10.0,
+        10.0,
+        0.0,
+        50.0,
+        90.0,
+        100.0,
+        30.0,
+        50.0
       ],
       "Solar": [
         0.0,
@@ -36,20 +49,11 @@
         10.0,
         10.0,
         10.0,
+        10.0,
         10.0
-      ],
-      "Oil": [
-        110.0,
-        10.0,
-        10.0,
-        10.0,
-        0.0,
-        50.0,
-        90.0,
-        100.0,
-        30.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       4440.0,
       4360.0,
@@ -59,7 +63,8 @@
       4230.0,
       4150.0,
       4360.0,
-      4740.0
+      4740.0,
+      4670.0
     ]
   },
   "capacity": {
@@ -74,7 +79,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -86,9 +92,11 @@
         730.0,
         730.0,
         730.0,
+        730.0,
         730.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        70.0,
         70.0,
         70.0,
         70.0,
@@ -108,7 +116,8 @@
         10.0,
         10.0,
         10.0,
-        10.0
+        10.0,
+        70.0
       ]
     }
   }

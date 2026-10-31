@@ -1,9 +1,8 @@
 {
   "country": "Lesotho",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Hydro": [
@@ -25,9 +25,11 @@
         430.0,
         530.0,
         480.0,
+        0.0,
         0.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       790.0,
       890.0,
@@ -37,7 +39,8 @@
       870.0,
       960.0,
       910.0,
-      450.0
+      450.0,
+      580.0
     ]
   },
   "capacity": {
@@ -52,31 +55,10 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Gas": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Other Fossil": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
       "Hydro": [
         70.0,
         70.0,
@@ -86,7 +68,8 @@
         70.0,
         70.0,
         70.0,
-        70.0
+        70.0,
+        80.0
       ],
       "Solar": [
         0.0,
@@ -97,6 +80,7 @@
         0.0,
         0.0,
         0.0,
+        30.0,
         30.0
       ]
     }

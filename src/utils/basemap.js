@@ -116,7 +116,8 @@ export function fetchBboxes() {
 
 /**
  * MapLibre bounds for a country or region, padded in degrees, or null when
- * the extract has no such feature.
+ * the extract has no such feature. East runs past 180 for what crosses the
+ * antimeridian (Fiji, Pacific SIDS), which fitBounds frames as one piece.
  *
  * @param {object} bboxes  from fetchBboxes()
  * @param {'countries'|'regions'} kind

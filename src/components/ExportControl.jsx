@@ -14,11 +14,13 @@ const BASEMAPS = [['clean', 'Clean'], ['detailed', 'Detailed'], ['satellite', 'S
  * @param {string}  props.title        printed on the PNG
  * @param {string}  props.fileName     without extension
  * @param {() => object[]} [props.legend]  legend rows at export time
+ * @param {Object<string, () => Promise<object>>} [props.sourceData]
+ *        whole-feature loaders for the page's non-GeoJSON sources, by id
  * @param {string}  [props.defaultBasemap] the page's current basemap
  * @param {object}  [props.style]      positioning
  * @param {boolean} [props.compact]    phone-sized type
  */
-export default function ExportControl({ mapRef, ready, t, title, fileName, legend, defaultBasemap = 'clean', style, compact }) {
+export default function ExportControl({ mapRef, ready, t, title, fileName, legend, sourceData, defaultBasemap = 'clean', style, compact }) {
   const [open, setOpen] = useState(false);
   // The page's basemap until the user picks one here.
   const [picked, setBasemap] = useState(null);
@@ -43,12 +45,14 @@ export default function ExportControl({ mapRef, ready, t, title, fileName, legen
     setBusy(true); setError(null);
     try {
       const { exportEqualEarthPng, downloadBlob } = await import('../utils/equalEarthExport');
-      const blob = await exportEqualEarthPng(map, { t, title, basemap, labels, legend: legend?.() || [] });
+      const blob = await exportEqualEarthPng(map, { t, title, basemap, labels, legend: legend?.() || [], sourceData });
       downloadBlob(blob, `${fileName}-equal-earth.png`);
       setOpen(false);
     } catch (err) {
       console.error('Equal Earth export', err);
-      setError('Export failed. Please try again.');
+      // The cause too: the export depends on World Bank services a network
+      // may block or slow, and the message is what a user can report.
+      setError(`Export failed: ${err?.message || 'unknown error'}. Please try again.`);
     } finally {
       setBusy(false);
     }

@@ -1,9 +1,8 @@
 {
   "country": "Nicaragua",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        2290.0,
+        2190.0,
+        1990.0,
+        1920.0,
+        1970.0,
+        1140.0,
+        1300.0,
+        1550.0,
+        1700.0,
+        1700.0
+      ],
       "Hydro": [
         290.0,
         430.0,
@@ -25,6 +37,7 @@
         570.0,
         600.0,
         600.0,
+        650.0,
         650.0
       ],
       "Solar": [
@@ -32,6 +45,7 @@
         0.0,
         10.0,
         20.0,
+        30.0,
         30.0,
         30.0,
         30.0,
@@ -47,18 +61,8 @@
         550.0,
         660.0,
         560.0,
+        560.0,
         560.0
-      ],
-      "Oil": [
-        2290.0,
-        2190.0,
-        1990.0,
-        1920.0,
-        1970.0,
-        1140.0,
-        1300.0,
-        1550.0,
-        1700.0
       ],
       "Bioenergy": [
         460.0,
@@ -69,20 +73,23 @@
         730.0,
         890.0,
         890.0,
+        890.0,
         890.0
       ],
       "Other Renewables": [
-        1140.0,
-        1240.0,
-        1420.0,
-        1500.0,
-        1620.0,
-        1500.0,
-        1620.0,
-        1580.0,
-        1580.0
+        680.0,
+        710.0,
+        750.0,
+        800.0,
+        780.0,
+        770.0,
+        730.0,
+        690.0,
+        690.0,
+        690.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       4600.0,
       4780.0,
@@ -92,7 +99,8 @@
       4860.0,
       5210.0,
       5380.0,
-      5340.0
+      5340.0,
+      5420.0
     ]
   },
   "capacity": {

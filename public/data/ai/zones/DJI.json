@@ -1,0 +1,1 @@
+{"1":{"zones":{"DJI_1":{"mw":60.0,"plants":2,"byFuelMw":{"wind":60.0}}},"links":[]},"2":{"zones":{"DJI_2":{"mw":60.0,"plants":2,"byFuelMw":{"wind":60.0}},"DJI_1":{"mw":0.0,"plants":0,"byFuelMw":{}}},"links":[["DJI_1","DJI_2"]]}}

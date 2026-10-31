@@ -43,7 +43,9 @@ OWID_FUEL_MAP = {
     'wind_electricity':             'Wind',
     'oil_electricity':              'Oil',
     'biofuel_electricity':          'Bioenergy',
-    'other_renewable_electricity':  'Other Renewables',
+    # Not other_renewable_electricity: that one includes bioenergy, which is
+    # already counted above, so bioenergy came out twice.
+    'other_renewable_exc_biofuel_electricity': 'Other Renewables',
 }
 
 # Countries to process by default — add any ISO3 here

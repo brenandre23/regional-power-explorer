@@ -1,9 +1,8 @@
 {
   "country": "Tunisia",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +26,22 @@
         20470.0,
         20970.0,
         20520.0,
-        20230.0
+        20230.0,
+        20200.0,
+        21180.0
+      ],
+      "Oil & Other Fossil": [
+        910.0,
+        40.0,
+        270.0,
+        330.0,
+        320.0,
+        240.0,
+        250.0,
+        240.0,
+        210.0,
+        230.0,
+        230.0
       ],
       "Hydro": [
         70.0,
@@ -35,6 +51,8 @@
         70.0,
         50.0,
         30.0,
+        10.0,
+        10.0,
         10.0,
         10.0
       ],
@@ -47,7 +65,9 @@
         150.0,
         220.0,
         320.0,
-        490.0
+        490.0,
+        560.0,
+        560.0
       ],
       "Wind": [
         450.0,
@@ -58,20 +78,12 @@
         470.0,
         430.0,
         320.0,
-        340.0
-      ],
-      "Oil": [
-        910.0,
-        40.0,
-        270.0,
-        330.0,
-        320.0,
-        240.0,
-        250.0,
-        240.0,
-        210.0
+        340.0,
+        370.0,
+        330.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       19380.0,
       19510.0,
@@ -81,7 +93,9 @@
       20780.0,
       22930.0,
       23980.0,
-      23780.0
+      23780.0,
+      23960.0,
+      24900.0
     ]
   },
   "capacity": {
@@ -96,24 +110,30 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
-        4450.0,
-        4700.0,
-        4700.0,
-        4700.0,
-        4700.0,
-        4700.0,
-        5320.0,
-        5770.0,
-        5770.0
+        4130.0,
+        4380.0,
+        4380.0,
+        4380.0,
+        4380.0,
+        4380.0,
+        5000.0,
+        5450.0,
+        5450.0,
+        5450.0,
+        5450.0
       ],
       "Hydro": [
         60.0,
         60.0,
         60.0,
+        70.0,
+        70.0,
         70.0,
         70.0,
         70.0,
@@ -127,15 +147,19 @@
         50.0,
         60.0,
         80.0,
-        90.0,
-        90.0,
+        100.0,
+        100.0,
         200.0,
-        510.0
+        510.0,
+        770.0,
+        890.0
       ],
       "Wind": [
         240.0,
         240.0,
         240.0,
+        250.0,
+        250.0,
         250.0,
         250.0,
         250.0,

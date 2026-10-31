@@ -1,0 +1,54 @@
+{
+  "country": "Albania",
+  "capacity": {
+    "source": "ENTSO-E Transparency Platform — Installed Generation Capacity Aggregated (A68)",
+    "unit": "MW",
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "fuels": {
+      "Hydro Reservoir": [
+        0,
+        1492.0,
+        1492.0,
+        1676.0,
+        1676.0,
+        1676.0,
+        1676.0
+      ],
+      "Hydro RoR": [
+        1492.0,
+        0,
+        0,
+        527.0,
+        527.0,
+        527.0,
+        527.0
+      ],
+      "Oil": [
+        0,
+        0,
+        0,
+        97.0,
+        97.0,
+        97.0,
+        97.0
+      ],
+      "Solar": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        5.0,
+        195.0
+      ]
+    }
+  }
+}

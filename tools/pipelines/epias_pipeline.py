@@ -2,7 +2,7 @@
 Turkiye electricity market prices — EPIAS Transparency Platform pipeline.
 https://seffaflik.epias.com.tr
 
-Generates public/data/market/TUR.json with seven hourly series:
+Generates public/data/market/TUR.json with nine hourly series:
   - dam:     Day-Ahead Market — Market Clearing Price (MCP), in TL/MWh
   - dam_eur: Day-Ahead Market — Market Clearing Price (MCP), in EUR/MWh
   - dam_usd: Day-Ahead Market — Market Clearing Price (MCP), in USD/MWh
@@ -10,6 +10,18 @@ Generates public/data/market/TUR.json with seven hourly series:
   - bpm:     Balancing Power Market — System Marginal Price (SMP), in TL/MWh
   - dam_qty: Day-Ahead Market — Matching Quantity, in MWh
   - idm_qty: Intraday Market — Matching Quantity, in MWh
+  - bpm_net: Balancing Power Market — Net Instructed Quantity, in MWh
+  - rt_cons: Real-Time Consumption, in MWh
+
+rt_cons reads the "consumption" column off "rt-cons" — a plain single-endpoint
+series like dam_qty, needing no custom compute function. It is NOT the same
+figure as the settled/final consumption (the "uecm" endpoint, used nowhere in
+this pipeline): verified for 2025-10-03, rt_cons runs ~5-7% above uecm on
+every single hour that day (929,236 vs. 878,214 MWh daily total). rt_cons is
+EPIAS's real-time/preliminary system-level consumption figure, published
+about 2 hours behind, and may be revised in later runs. Its true data start
+is 2015-12-31 (earlier than every other series here), but it's backfilled
+from 2017-11-01 like the rest, for consistency.
 
 dam/dam_eur/dam_usd all come from the same "mcp" endpoint response — it
 returns price, priceEur and priceUsd columns per hour (confirmed against
@@ -22,6 +34,16 @@ has NO date/hour column at all — only a kontratAdi contract code (e.g.
 "PH26090900" = PH + YYMMDDHH, Turkey local time) for hourly contracts, plus
 "Blok" (block, multi-hour) contracts that don't fit this shape and are
 dropped. See _decode_idm_qty_timestamp.
+
+bpm_net is the only series sourced from TWO endpoints at once ("bpm-up" and
+"bpm-down") — see _bpm_net_series. It's net = (up's three "Coded" columns
+summed) - (down's three "Coded" columns summed), NOT the "Delivered"
+columns and NOT the pre-built "net" column each endpoint already returns
+(they're identical to each other but do not match EPIAS's own website,
+which displays the Coded-column sum — verified against the website for
+2026-10-04, matching to the penny on every checked hour including the
+daily total; the "Delivered"-based "net" field differs by up to ~78 in a
+single hour on that same date, so it was deliberately not used).
 
 Good to know:
   - Auth is handled by the eptr2 client (logs in with username/password,
@@ -77,11 +99,41 @@ HOURLY_RETENTION_DAYS = 90
 # this has generous headroom without risking cutting off a slow-but-good one.
 REQUEST_TIMEOUT_SECONDS = 30
 
+# bpm_net is the one series computed from TWO endpoint responses at once
+# ("bpm-up" and "bpm-down") rather than one column off one response, so it
+# needs its own combining function ahead of SERIES, which references it
+# directly. net = (up's three "Coded" columns summed) - (down's three
+# "Coded" columns summed) — deliberately NOT the "Delivered" columns, and
+# NOT the "net" column each endpoint already returns (identical between the
+# two, but doesn't match EPIAS's own website — verified for 2026-10-04,
+# where only the Coded-column sum matches the website to the penny,
+# including the daily total; "net"/"Delivered" differ by up to ~78 in a
+# single hour that same date).
+def _bpm_net_series(endpoint_frames: dict) -> pd.Series:
+    up, down = endpoint_frames.get('bpm-up'), endpoint_frames.get('bpm-down')
+    if up is None or down is None or up.empty or down.empty:
+        return pd.Series(dtype=float)
+    up_coded   = up['upRegulationZeroCoded']     + up['upRegulationOneCoded']     + up['upRegulationTwoCoded']
+    down_coded = down['downRegulationZeroCoded'] + down['downRegulationOneCoded'] + down['downRegulationTwoCoded']
+    common = up_coded.index.intersection(down_coded.index)
+    only_up, only_down = up_coded.index.difference(down_coded.index), down_coded.index.difference(up_coded.index)
+    if len(only_up) or len(only_down):
+        print(f'  [epias] bpm_net: WARNING — {len(only_up)} hour(s) only in bpm-up and '
+              f'{len(only_down)} hour(s) only in bpm-down ({len(only_up) + len(only_down)} total) — '
+              f'treated as gaps, not zero, and excluded from bpm_net.')
+    return up_coded.loc[common] - down_coded.loc[common]
+
+
 # ─── Series registry — add a new price series by adding one entry here ──────
 #   endpoint    : eptr2 call name (see eptr2 docs / seffaflik technical guide)
+#                 — a string for a single-endpoint series, or a list for one
+#                 that reads from more than one (only bpm_net, so far)
 #   label       : human-readable name, shown in the output json and the UI
 #   value_field : column in the eptr2 response holding the price number
 #   unit        : shown in the output json, per series
+#   compute     : only on a multi-endpoint series — a function taking the
+#                 full {endpoint: DataFrame} map and returning the hourly
+#                 pd.Series directly, bypassing value_field entirely
 #
 # dam / dam_eur / dam_usd share the same "mcp" endpoint response — it returns
 # price (TL), priceEur and priceUsd columns per hour — so they're fetched
@@ -94,6 +146,8 @@ SERIES = {
     'bpm':     {'endpoint': 'smp',          'label': 'Balancing Power Market — System Marginal Price',  'value_field': 'systemMarginalPrice',  'unit': 'TL/MWh'},
     'dam_qty': {'endpoint': 'dam-clearing', 'label': 'Day-Ahead Market — Matching Quantity',            'value_field': 'matchedBids',          'unit': 'MWh'},
     'idm_qty': {'endpoint': 'idm-qty',      'label': 'Intraday Market — Matching Quantity',             'value_field': 'clearingQuantityBid',  'unit': 'MWh'},
+    'bpm_net': {'endpoint': ['bpm-up', 'bpm-down'], 'label': 'Balancing Power Market — Net Instructed Quantity', 'unit': 'MWh', 'compute': _bpm_net_series},
+    'rt_cons': {'endpoint': 'rt-cons',      'label': 'Real-Time Consumption',                            'value_field': 'consumption',          'unit': 'MWh'},
 }
 
 
@@ -309,8 +363,12 @@ def run(start_date: str | None = None, end_date: str | None = None) -> None:
 
     # Fetch each distinct endpoint once, then let every series that reads
     # from it (e.g. dam / dam_eur / dam_usd all read "mcp") pull its own
-    # column out of the same fetched data instead of re-fetching.
-    endpoints = dict.fromkeys(cfg['endpoint'] for cfg in SERIES.values())
+    # column out of the same fetched data instead of re-fetching. A series'
+    # "endpoint" can be a list (bpm_net reads both bpm-up and bpm-down).
+    endpoints = {}
+    for cfg in SERIES.values():
+        for endpoint in (cfg['endpoint'] if isinstance(cfg['endpoint'], list) else [cfg['endpoint']]):
+            endpoints[endpoint] = None
     endpoint_frames = {}
     for endpoint in endpoints:
         print(f'[epias] fetching endpoint "{endpoint}" ...')
@@ -318,7 +376,10 @@ def run(start_date: str | None = None, end_date: str | None = None) -> None:
 
     for key, cfg in SERIES.items():
         print(f'[epias] {cfg["label"]} ({key}) ...')
-        hourly = _extract_series(endpoint_frames[cfg['endpoint']], cfg['endpoint'], cfg['value_field'])
+        if 'compute' in cfg:
+            hourly = cfg['compute'](endpoint_frames)
+        else:
+            hourly = _extract_series(endpoint_frames[cfg['endpoint']], cfg['endpoint'], cfg['value_field'])
         if hourly.empty:
             print(f'  [epias] WARNING: no new data for {key} this run — kept previous values')
         market[key] = _build_series_block(existing.get(key, {}), cfg['label'], cfg['unit'], hourly)

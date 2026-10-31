@@ -44,7 +44,7 @@ YEARS = list(range(2015, 2024))  # 2015-2023
 EMBER_FUEL_MAP: dict[str, str] = {
     'Coal':             'Coal',
     'Gas':              'Gas',
-    'Other Fossil':     'Other Fossil',
+    'Other Fossil':     'Oil & Other Fossil',  # Ember: oil, diesel and other fossil fuels
     'Nuclear':          'Nuclear',
     'Hydro':            'Hydro',
     'Solar':            'Solar',
@@ -54,15 +54,20 @@ EMBER_FUEL_MAP: dict[str, str] = {
 }
 
 
-def _load_ember(refresh: bool = False) -> pd.DataFrame:
+def load_ember_csv(refresh: bool = False) -> pd.DataFrame:
+    """The whole Ember long-format CSV, downloaded once and cached."""
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     if not CACHE_FILE.exists() or refresh:
-        print('  Downloading Ember yearly electricity data (~40 MB)...')
+        print('  Downloading Ember yearly electricity data (~50 MB)...')
         r = requests.get(EMBER_URL, timeout=180)
         r.raise_for_status()
         CACHE_FILE.write_bytes(r.content)
         print(f'  Cached -> {CACHE_FILE}')
-    df = pd.read_csv(CACHE_FILE, low_memory=False)
+    return pd.read_csv(CACHE_FILE, low_memory=False)
+
+
+def _load_ember(refresh: bool = False) -> pd.DataFrame:
+    df = load_ember_csv(refresh)
     # Keep only capacity rows for individual fuel types
     cap = df[
         (df['Category'] == 'Capacity') &

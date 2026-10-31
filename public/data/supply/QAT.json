@@ -1,9 +1,8 @@
 {
   "country": "Qatar",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +26,9 @@
         49260.0,
         51640.0,
         54030.0,
-        54370.0
+        54370.0,
+        54400.0,
+        53900.0
       ],
       "Solar": [
         10.0,
@@ -36,7 +39,9 @@
         10.0,
         10.0,
         590.0,
-        1880.0
+        1880.0,
+        2150.0,
+        2150.0
       ],
       "Bioenergy": [
         120.0,
@@ -47,20 +52,12 @@
         130.0,
         140.0,
         130.0,
-        130.0
-      ],
-      "Other Renewables": [
-        120.0,
-        120.0,
         130.0,
-        140.0,
-        120.0,
-        130.0,
-        140.0,
         130.0,
         130.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       41630.0,
       42440.0,
@@ -70,7 +67,9 @@
       49400.0,
       51790.0,
       54750.0,
-      56380.0
+      56380.0,
+      56680.0,
+      56180.0
     ]
   },
   "capacity": {
@@ -85,13 +84,17 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
         10060.0,
         10060.0,
         11320.0,
+        12580.0,
+        12580.0,
         12580.0,
         12580.0,
         12580.0,
@@ -108,20 +111,13 @@
         10.0,
         10.0,
         810.0,
-        810.0
-      ],
-      "Bioenergy": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        810.0,
+        810.0,
+        1680.0
       ],
       "Other Renewables": [
+        10.0,
+        10.0,
         10.0,
         10.0,
         10.0,

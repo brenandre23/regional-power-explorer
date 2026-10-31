@@ -1,9 +1,8 @@
 {
   "country": "Nepal",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Hydro": [
@@ -25,7 +25,8 @@
         6090.0,
         9530.0,
         10590.0,
-        10590.0
+        10590.0,
+        11000.0
       ],
       "Solar": [
         20.0,
@@ -36,9 +37,11 @@
         80.0,
         90.0,
         100.0,
-        100.0
+        100.0,
+        120.0
       ],
       "Wind": [
+        10.0,
         10.0,
         10.0,
         10.0,
@@ -50,6 +53,7 @@
         10.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       5230.0,
       6350.0,
@@ -59,7 +63,8 @@
       8950.0,
       10680.0,
       11190.0,
-      10650.0
+      10650.0,
+      11030.0
     ]
   },
   "capacity": {
@@ -74,10 +79,12 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        50.0,
         50.0,
         50.0,
         50.0,
@@ -97,7 +104,8 @@
         1280.0,
         1970.0,
         2200.0,
-        2670.0
+        2680.0,
+        3290.0
       ],
       "Solar": [
         10.0,
@@ -108,20 +116,11 @@
         60.0,
         90.0,
         110.0,
-        120.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        120.0,
+        170.0
       ],
       "Bioenergy": [
+        10.0,
         10.0,
         10.0,
         10.0,

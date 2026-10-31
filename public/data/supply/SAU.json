@@ -1,9 +1,8 @@
 {
   "country": "Saudi Arabia",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         231570.0,
         242090.0,
         247840.0,
-        265500.0
+        265500.0,
+        287980.0
+      ],
+      "Oil & Other Fossil": [
+        185260.0,
+        169050.0,
+        172190.0,
+        147930.0,
+        154790.0,
+        148410.0,
+        149860.0,
+        159990.0,
+        159030.0,
+        156840.0
       ],
       "Solar": [
         50.0,
@@ -36,7 +49,8 @@
         910.0,
         990.0,
         1220.0,
-        3130.0
+        3130.0,
+        8230.0
       ],
       "Wind": [
         0.0,
@@ -47,20 +61,11 @@
         10.0,
         10.0,
         790.0,
+        1590.0,
         1590.0
-      ],
-      "Oil": [
-        185260.0,
-        169050.0,
-        172190.0,
-        147930.0,
-        154790.0,
-        148410.0,
-        149860.0,
-        159990.0,
-        159030.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       350590.0,
       356940.0,
@@ -70,7 +75,8 @@
       380530.0,
       392910.0,
       409800.0,
-      429210.0
+      429210.0,
+      454590.0
     ]
   },
   "capacity": {
@@ -85,30 +91,33 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
-        49120.0,
-        53260.0,
-        53980.0,
-        59680.0,
-        61820.0,
-        65910.0,
-        65910.0,
-        69250.0,
-        69250.0
+        49000.0,
+        53140.0,
+        53850.0,
+        59560.0,
+        61700.0,
+        65790.0,
+        65790.0,
+        69420.0,
+        69420.0,
+        69420.0
       ],
-      "Other Fossil": [
-        17860.0,
-        20650.0,
-        21470.0,
-        22080.0,
-        26600.0,
-        27850.0,
-        27850.0,
-        27910.0,
-        28040.0
+      "Oil & Other Fossil": [
+        18150.0,
+        20940.0,
+        21770.0,
+        22370.0,
+        26890.0,
+        28150.0,
+        28150.0,
+        28210.0,
+        28330.0,
+        28330.0
       ],
       "Solar": [
         20.0,
@@ -119,7 +128,8 @@
         410.0,
         440.0,
         440.0,
-        2590.0
+        2440.0,
+        6200.0
       ],
       "Wind": [
         0.0,
@@ -129,6 +139,7 @@
         0.0,
         0.0,
         0.0,
+        400.0,
         400.0,
         400.0
       ]

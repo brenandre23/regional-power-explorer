@@ -1,9 +1,8 @@
 {
   "country": "Oman",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +26,22 @@
         37200.0,
         38800.0,
         38800.0,
-        41200.0
+        41200.0,
+        44800.0,
+        48540.0
+      ],
+      "Oil & Other Fossil": [
+        860.0,
+        940.0,
+        1040.0,
+        1130.0,
+        1120.0,
+        900.0,
+        1500.0,
+        1700.0,
+        1600.0,
+        1900.0,
+        1900.0
       ],
       "Solar": [
         0.0,
@@ -36,7 +52,9 @@
         100.0,
         600.0,
         1800.0,
-        2100.0
+        2100.0,
+        2300.0,
+        2300.0
       ],
       "Wind": [
         0.0,
@@ -47,20 +65,12 @@
         0.0,
         100.0,
         100.0,
+        100.0,
+        100.0,
         100.0
-      ],
-      "Oil": [
-        860.0,
-        940.0,
-        1040.0,
-        1130.0,
-        1120.0,
-        900.0,
-        1500.0,
-        1700.0,
-        1600.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       32750.0,
       34230.0,
@@ -70,7 +80,9 @@
       38200.0,
       41000.0,
       42400.0,
-      45000.0
+      45000.0,
+      49100.0,
+      52840.0
     ]
   },
   "capacity": {
@@ -85,7 +97,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -95,14 +109,18 @@
         9660.0,
         13280.0,
         13390.0,
-        13830.0,
-        13830.0,
-        13960.0
+        13350.0,
+        13350.0,
+        13480.0,
+        13480.0,
+        13480.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         60.0,
         60.0,
         60.0,
+        140.0,
+        140.0,
         140.0,
         140.0,
         140.0,
@@ -119,13 +137,17 @@
         130.0,
         160.0,
         660.0,
-        670.0
+        670.0,
+        670.0,
+        1670.0
       ],
       "Wind": [
         0.0,
         0.0,
         0.0,
         0.0,
+        50.0,
+        50.0,
         50.0,
         50.0,
         50.0,

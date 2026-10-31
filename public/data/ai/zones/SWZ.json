@@ -1,0 +1,1 @@
+{"1":{"zones":{"SWZ_1":{"mw":78.4,"plants":21,"byFuelMw":{"solar":15.4,"hydro":54.0,"gas":9.0}}},"links":[]},"2":{"zones":{"SWZ_2":{"mw":58.6,"plants":19,"byFuelMw":{"solar":14.6,"hydro":35.0,"gas":9.0}},"SWZ_1":{"mw":19.8,"plants":2,"byFuelMw":{"hydro":19.0,"solar":0.8}}},"links":[["SWZ_1","SWZ_2"]]}}

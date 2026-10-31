@@ -1,9 +1,8 @@
 {
   "country": "Indonesia",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,8 @@
         180870.0,
         189960.0,
         205310.0,
-        216780.0
+        216780.0,
+        228430.0
       ],
       "Gas": [
         54140.0,
@@ -36,7 +37,20 @@
         51280.0,
         56530.0,
         56710.0,
-        62040.0
+        62040.0,
+        68780.0
+      ],
+      "Oil & Other Fossil": [
+        30920.0,
+        20800.0,
+        18850.0,
+        17950.0,
+        10590.0,
+        6780.0,
+        6670.0,
+        6110.0,
+        6580.0,
+        7120.0
       ],
       "Hydro": [
         13740.0,
@@ -47,7 +61,8 @@
         24330.0,
         24700.0,
         27300.0,
-        24590.0
+        24590.0,
+        27290.0
       ],
       "Solar": [
         10.0,
@@ -58,7 +73,8 @@
         170.0,
         190.0,
         440.0,
-        710.0
+        710.0,
+        1350.0
       ],
       "Wind": [
         0.0,
@@ -69,18 +85,8 @@
         470.0,
         440.0,
         360.0,
-        480.0
-      ],
-      "Oil": [
-        30920.0,
-        20800.0,
-        18850.0,
-        17950.0,
-        10590.0,
-        6780.0,
-        6670.0,
-        6110.0,
-        6580.0
+        480.0,
+        470.0
       ],
       "Bioenergy": [
         9750.0,
@@ -91,20 +97,23 @@
         12350.0,
         14960.0,
         20620.0,
-        22480.0
+        22480.0,
+        21330.0
       ],
       "Other Renewables": [
-        19810.0,
-        20870.0,
-        24530.0,
-        26460.0,
-        26280.0,
-        27920.0,
-        30870.0,
-        37310.0,
-        39420.0
+        10060.0,
+        10660.0,
+        13060.0,
+        14330.0,
+        14110.0,
+        15570.0,
+        15910.0,
+        16690.0,
+        16940.0,
+        16770.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       243290.0,
       258240.0,
@@ -114,7 +123,8 @@
       293370.0,
       310330.0,
       334340.0,
-      351490.0
+      351490.0,
+      372500.0
     ]
   },
   "capacity": {

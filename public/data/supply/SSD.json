@@ -1,9 +1,8 @@
 {
   "country": "South Sudan",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        580.0,
+        520.0,
+        540.0,
+        540.0,
+        550.0,
+        550.0,
+        560.0,
+        500.0,
+        550.0,
+        550.0
+      ],
       "Solar": [
         0.0,
         0.0,
@@ -25,20 +37,11 @@
         10.0,
         10.0,
         10.0,
+        10.0,
         10.0
-      ],
-      "Oil": [
-        580.0,
-        520.0,
-        540.0,
-        540.0,
-        550.0,
-        550.0,
-        560.0,
-        500.0,
-        550.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       580.0,
       520.0,
@@ -48,6 +51,7 @@
       560.0,
       570.0,
       510.0,
+      560.0,
       560.0
     ]
   },
@@ -63,10 +67,11 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         80.0,
         80.0,
         130.0,
@@ -75,6 +80,7 @@
         160.0,
         170.0,
         170.0,
+        200.0,
         200.0
       ],
       "Solar": [
@@ -86,7 +92,8 @@
         0.0,
         0.0,
         0.0,
-        20.0
+        20.0,
+        30.0
       ]
     }
   }

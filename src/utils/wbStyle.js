@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { WB_BASEMAP_STYLE_URL } from '../constants';
-import { mix } from './color';
+import { mix, withAlpha } from './color';
 
 /**
  * The approved World Bank vector basemap, adapted to this app.
@@ -95,6 +95,8 @@ function palette(t) {
     admin1: mix(t.worldBdr, t.land, 0.35),
     admin2: mix(t.worldBdr, t.land, 0.55),
     name: t.lblMuted,
+    countryName: adm0LabelColor(t),
+    countryHalo: withAlpha(t.land, ADM0_HALO_ALPHA),
     capital: t.lbl,
     halo: t.land,
   };
@@ -122,7 +124,32 @@ export const HIDDEN_ADM0_LABELS = [
   'Jammu and Kashmir', 'South Georgia (U.K.)', 'South Sandwich Islands (U.K.)',
 ];
 export const ITALIC_ADM0_LABELS = ['West Bank', 'Gaza', 'Western Sahara'];
-const ITALIC_FONT = ['Ubuntu Bold Italic'];   // the italic of the labels' Ubuntu Bold
+// The Bank publishes its country names in Ubuntu Bold, which at map sizes reads
+// as a heading laid over the map rather than as part of it. They are drawn here
+// the way the PNG export already draws them: Regular, tracked out, and pulled
+// off the muted label colour toward the solid one so the thinner strokes still
+// hold over a region fill.
+//
+// The italic names (see ITALIC_ADM0_LABELS) stay Bold Italic. The style's glyph
+// endpoint is known to serve that face and 'Ubuntu Regular'; a face it does not
+// serve renders as nothing, and these three names must not be the ones to go
+// missing.
+const ITALIC_FONT = ['Ubuntu Bold Italic'];
+const ADM0_FONT = ['Ubuntu Regular'];
+const ADM0_LETTER_SPACING = 0.1;    // em, the export's own tracking
+// A halo drawn in the land colour at full strength rings every glyph, which
+// over a region fill reads as an outline and thickens thin strokes back toward
+// the Bold look. Half-transparent and blurred across its whole width, it lifts
+// the name off the fill without being seen as a line of its own.
+const ADM0_HALO_WIDTH = 1.2;
+const ADM0_HALO_BLUR = 1.2;
+const ADM0_HALO_ALPHA = 0.5;
+const ADM0_COLOR_MIX = 0.55;        // lblMuted -> lbl
+
+/** The colour country names are drawn in, on the map and in the PNG export. */
+export function adm0LabelColor(t) {
+  return mix(t.lblMuted, t.lbl, ADM0_COLOR_MIX);
+}
 
 // Country name sizes. The Bank's label classes run from 8.5 px (small
 // countries) to 20 px (large ones at z7+), a spread that reads as shouting next
@@ -194,11 +221,13 @@ export function adm0LabelsOnly(layer) {
 
 /** Hide and italicise ADM0 labels by their text, read from the layer's own name field. */
 function adjustAdm0Label(layer, layout) {
+  layout['text-font'] = ADM0_FONT;
+  layout['text-letter-spacing'] = ADM0_LETTER_SPACING;
   const field = /^\{(_name\d*)\}$/.exec(layout['text-field'] || '')?.[1];
   if (!field) return layer.filter;
   layout['text-size'] = adm0SizeSpec(layout['text-size']);
   layout['text-font'] = ['case', ['in', ['get', field], ['literal', ITALIC_ADM0_LABELS]],
-    ['literal', ITALIC_FONT], ['literal', layout['text-font']]];
+    ['literal', ITALIC_FONT], ['literal', ADM0_FONT]];
   const only = adm0LabelsOnly(layer);
   const keep = only ? ['in', ['get', field], ['literal', only]]
     : ['!', ['in', ['get', field], ['literal', HIDDEN_ADM0_LABELS]]];
@@ -226,10 +255,15 @@ function themeWbLayer(layer, group, p) {
     }
   } else if (group === 'admin1' || group === 'admin2') {
     paint['line-color'] = p[group];
-  } else if (group === 'countryNames' || group === 'adminLabels') {
+  } else if (group === 'countryNames') {
+    paint['text-color'] = p.countryName;
+    paint['text-halo-color'] = p.countryHalo;
+    paint['text-halo-width'] = ADM0_HALO_WIDTH;
+    paint['text-halo-blur'] = ADM0_HALO_BLUR;
+    filter = adjustAdm0Label(layer, layout);
+  } else if (group === 'adminLabels') {
     paint['text-color'] = p.name;
     paint['text-halo-color'] = p.halo;
-    if (group === 'countryNames') filter = adjustAdm0Label(layer, layout);
   } else if (group === 'capitals') {
     paint['text-color'] = p.capital;
     paint['text-halo-color'] = p.halo;

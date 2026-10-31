@@ -1,9 +1,8 @@
 {
   "country": "Benin",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         750.0,
         890.0,
         730.0,
+        730.0,
         730.0
+      ],
+      "Oil & Other Fossil": [
+        210.0,
+        260.0,
+        180.0,
+        130.0,
+        210.0,
+        230.0,
+        220.0,
+        240.0,
+        240.0,
+        240.0
       ],
       "Solar": [
         0.0,
@@ -36,20 +49,11 @@
         10.0,
         20.0,
         20.0,
-        30.0
-      ],
-      "Oil": [
-        210.0,
-        260.0,
-        180.0,
-        130.0,
-        210.0,
-        230.0,
-        220.0,
-        240.0,
-        240.0
+        30.0,
+        40.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       1370.0,
       1360.0,
@@ -59,7 +63,8 @@
       1630.0,
       1820.0,
       1820.0,
-      2290.0
+      2290.0,
+      2310.0
     ]
   },
   "capacity": {
@@ -74,7 +79,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -86,9 +92,10 @@
         130.0,
         130.0,
         130.0,
+        130.0,
         130.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         100.0,
         200.0,
         200.0,
@@ -97,18 +104,8 @@
         170.0,
         170.0,
         170.0,
+        170.0,
         170.0
-      ],
-      "Hydro": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
       ],
       "Solar": [
         0.0,
@@ -119,6 +116,7 @@
         0.0,
         10.0,
         30.0,
+        40.0,
         40.0
       ]
     }

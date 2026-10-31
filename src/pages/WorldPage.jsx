@@ -8,7 +8,6 @@ import { getT } from '../constants';
 import { buildWbStyle, useWbStyleBase } from '../utils/wbStyle';
 import MapChat from '../chat/LazyMapChat';
 import ExportControl from '../components/ExportControl';
-import { onFirstDraw } from '../utils/mapDrawn';
 import { prefetchPages } from './lazyPages';
 import { fetchBboxes, fetchNdlsa, prefetchGeo, addGeoSource, geoDetail, countryLayer, featureTarget, isArea, areaName, isNamed, nameHtml, isItalicName, regionFilter, addNdlsaLayer, raiseBoundaries, fillAnchor } from '../utils/basemap';
 
@@ -177,8 +176,6 @@ export default function WorldPage() {
           ...availableIsos.flatMap(iso => [iso, isoToRegions[iso][0].color]),
           'transparent',
         ];
-        // The welcome screen (index.html) lets the visitor in once these are drawn.
-        onFirstDraw(map, 'countries', () => window.rpeWelcome?.mapReady());
         map.addLayer({
           id: 'region-fill',
           type: 'fill',
@@ -212,15 +209,16 @@ export default function WorldPage() {
         const f = e.features[0];
         if (!isNamed(f)) { popup.remove(); return; }
         const rs = regionsFor(f);
+        if (rs.length === 0) { popup.remove(); return; }
         // The polygon's own Bank name, not regions.json's: the popup names what the map draws.
         const countryName = areaName(f) || rs[0]?.countryName || f.properties.ISO_A3;
+        // Each region with its map colour, as the click chooser draws it.
+        const swatch = r => `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${r.color};margin-right:5px"></span>${r.name}`;
         const subtitle = rs.length > 1
-          ? rs.map(r => r.name).join(' · ') + ' · click to choose'
-          : rs.length === 1
-            ? rs[0].name + ' · click to explore'
-            : 'Non-determined legal status area';
+          ? rs.map(swatch).join('<br>') + '<br><span style="opacity:0.65">Click to choose</span>'
+          : swatch(rs[0]) + ' <span style="opacity:0.65">· click to explore</span>';
         popup.setLngLat(e.lngLat)
-          .setHTML(`<b>${nameHtml(countryName)}</b><br><span style="opacity:0.65">${subtitle}</span>`)
+          .setHTML(`<b>${nameHtml(countryName)}</b><br>${subtitle}`)
           .addTo(map);
       });
 
@@ -443,17 +441,6 @@ export default function WorldPage() {
         Pilot · Indicative data · Partly AI-generated, not fact-checked · Boundaries for reference only · Unofficial
       </div>
 
-      {/* ── About this map: reopens the welcome screen in index.html. Top right,
-          under the export button: the bottom-right corner is the chat's. ── */}
-      <button onClick={() => window.rpeWelcome?.show()} style={{
-        position: 'absolute', top: isMobile ? 100 : 86, right: 12, zIndex: 50,
-        backgroundColor: t.panel, border: `1px solid ${t.panelBorder}`,
-        borderRadius: 6, padding: '4px 10px', cursor: 'pointer',
-        fontSize: '0.6rem', fontWeight: 600, fontFamily: 'inherit', color: t.lbl,
-        boxShadow: '0 1px 8px rgba(0,0,0,.18)',
-      }}>
-        About this map
-      </button>
     </div>
   );
 }

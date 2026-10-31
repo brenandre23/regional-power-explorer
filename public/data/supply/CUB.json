@@ -1,9 +1,8 @@
 {
   "country": "Cuba",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         2010.0,
         1580.0,
         1950.0,
-        2500.0
+        2500.0,
+        2650.0
+      ],
+      "Oil & Other Fossil": [
+        16540.0,
+        16720.0,
+        16970.0,
+        17440.0,
+        17360.0,
+        16120.0,
+        15460.0,
+        13030.0,
+        16520.0,
+        16000.0
       ],
       "Hydro": [
         50.0,
@@ -34,6 +47,7 @@
         140.0,
         140.0,
         110.0,
+        120.0,
         120.0,
         120.0,
         120.0
@@ -47,7 +61,8 @@
         220.0,
         220.0,
         210.0,
-        210.0
+        210.0,
+        240.0
       ],
       "Wind": [
         20.0,
@@ -58,18 +73,8 @@
         20.0,
         20.0,
         60.0,
-        60.0
-      ],
-      "Oil": [
-        16540.0,
-        16720.0,
-        16970.0,
-        17440.0,
-        17360.0,
-        16120.0,
-        15460.0,
-        13030.0,
-        16520.0
+        60.0,
+        70.0
       ],
       "Bioenergy": [
         700.0,
@@ -80,20 +85,11 @@
         550.0,
         430.0,
         280.0,
-        330.0
-      ],
-      "Other Renewables": [
-        700.0,
-        690.0,
-        620.0,
-        440.0,
-        520.0,
-        550.0,
-        430.0,
-        280.0,
-        330.0
+        330.0,
+        350.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       20390.0,
       20550.0,
@@ -103,7 +99,8 @@
       19030.0,
       17830.0,
       15650.0,
-      19740.0
+      19740.0,
+      19430.0
     ]
   },
   "capacity": {
@@ -118,7 +115,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -130,9 +128,10 @@
         580.0,
         580.0,
         580.0,
+        580.0,
         580.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         5200.0,
         5360.0,
         5300.0,
@@ -141,9 +140,11 @@
         5320.0,
         5400.0,
         4900.0,
+        5320.0,
         5320.0
       ],
       "Hydro": [
+        70.0,
         70.0,
         70.0,
         70.0,
@@ -163,9 +164,11 @@
         210.0,
         250.0,
         270.0,
-        280.0
+        280.0,
+        390.0
       ],
       "Wind": [
+        20.0,
         20.0,
         20.0,
         20.0,
@@ -184,6 +187,7 @@
         370.0,
         480.0,
         480.0,
+        440.0,
         440.0,
         440.0
       ]

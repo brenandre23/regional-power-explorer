@@ -1,8 +1,15 @@
 """
 ENTSO-E supply + trade pipeline.
 
-Generates public/data/supply/{ISO3}.json and public/data/trade/{ISO3}.json
+Generates public/data/entsoe/{ISO3}.json and public/data/trade/{ISO3}.json
 for all ENTSO-E member countries.
+
+Capacity goes to entsoe/<ISO3>.json for the AI assistant's fuel_detail tool (its
+finer split: hydro run-of-river, reservoir and pumped storage; lignite and hard
+coal; onshore and offshore wind); the generation in those files comes from
+ENTSO-E's harmonised statistics (entsoe_stats_pipeline.py). The explorer's supply
+series come from Ember (public/data/methodology.md). Trade stays ENTSO-E's, with
+known problems under investigation (docs/TRADE_AUDIT.md).
 
 Data sources:
   Generation (GWh): A75 — Actual Generation per Production Type
@@ -37,11 +44,10 @@ from configparser import ConfigParser
 from pathlib import Path
 
 import pandas as pd
-from entsoe import EntsoePandasClient
 
 ROOT      = Path(__file__).resolve().parents[2]
 RAW       = ROOT / 'data-source' / 'raw' / 'ENTSOE'
-OUT       = ROOT / 'public' / 'data' / 'supply'
+OUT       = ROOT / 'public' / 'data' / 'entsoe'
 OUT_TRADE = ROOT / 'public' / 'data' / 'trade'
 
 YEARS = list(range(2015, 2025))
@@ -544,11 +550,19 @@ def _build_country(client, iso2, iso3, name, refresh, with_trade=True):
             },
         }
 
+    # entsoe/<ISO3>.json keeps capacity only: generation comes from ENTSO-E's harmonised
+    # statistics (entsoe_stats_pipeline.py), and the supply series from Ember. Not for
+    # countries queried through one price zone (AREA_OVERRIDES other than DE_LU), whose
+    # capacity covers that zone only (docs/TRADE_AUDIT.md, finding 1).
     OUT.mkdir(parents=True, exist_ok=True)
     out_path = OUT / f'{iso3}.json'
-    with open(out_path, 'w', encoding='utf-8') as fh:
-        json.dump(supply, fh, indent=2, ensure_ascii=False)
-    print(f'  supply -> {out_path}')
+    one_zone = iso2 in AREA_OVERRIDES and iso2 != 'DE'
+    if 'capacity' in supply and not one_zone:
+        existing = json.loads(out_path.read_text(encoding='utf-8')) if out_path.exists() else {'country': name}
+        existing['capacity'] = supply['capacity']
+        with open(out_path, 'w', encoding='utf-8') as fh:
+            json.dump(existing, fh, indent=2, ensure_ascii=False)
+        print(f'  entsoe capacity -> {out_path}')
 
     if with_trade:
         _build_trade(client, iso2, iso3, name, refresh)
@@ -564,6 +578,9 @@ def run(iso2_filter=None, refresh=False, with_trade=True):
         refresh:     re-download even if cache exists
         with_trade:  also generate trade/{ISO3}.json (default True)
     """
+    # Imported here so other scripts can reuse this module's mappings without entsoe-py.
+    from entsoe import EntsoePandasClient
+
     RAW.mkdir(parents=True, exist_ok=True)
     token  = _load_token()
     client = EntsoePandasClient(api_key=token)

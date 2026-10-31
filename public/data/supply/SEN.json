@@ -1,9 +1,8 @@
 {
   "country": "Senegal",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,8 @@
         150.0,
         400.0,
         470.0,
-        90.0
+        90.0,
+        100.0
       ],
       "Gas": [
         80.0,
@@ -36,13 +37,27 @@
         50.0,
         20.0,
         20.0,
+        20.0,
         20.0
+      ],
+      "Oil & Other Fossil": [
+        3760.0,
+        3880.0,
+        3820.0,
+        3710.0,
+        4220.0,
+        4840.0,
+        4890.0,
+        5260.0,
+        6700.0,
+        6000.0
       ],
       "Hydro": [
         330.0,
         360.0,
         360.0,
         360.0,
+        310.0,
         310.0,
         310.0,
         310.0,
@@ -58,7 +73,8 @@
         380.0,
         540.0,
         590.0,
-        590.0
+        590.0,
+        680.0
       ],
       "Wind": [
         0.0,
@@ -69,18 +85,8 @@
         220.0,
         400.0,
         400.0,
-        380.0
-      ],
-      "Oil": [
-        3760.0,
-        3880.0,
-        3820.0,
-        3710.0,
-        4220.0,
-        4840.0,
-        4890.0,
-        5260.0,
-        6700.0
+        380.0,
+        410.0
       ],
       "Bioenergy": [
         70.0,
@@ -91,20 +97,11 @@
         110.0,
         100.0,
         110.0,
-        110.0
-      ],
-      "Other Renewables": [
-        70.0,
-        60.0,
-        80.0,
-        90.0,
-        120.0,
-        110.0,
-        100.0,
         110.0,
         110.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       4770.0,
       5140.0,
@@ -114,7 +111,8 @@
       6420.0,
       6970.0,
       7650.0,
-      8740.0
+      8740.0,
+      8130.0
     ]
   },
   "capacity": {
@@ -129,7 +127,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -139,6 +138,7 @@
         30.0,
         30.0,
         30.0,
+        160.0,
         160.0,
         160.0,
         160.0
@@ -152,9 +152,10 @@
         160.0,
         160.0,
         280.0,
-        280.0
+        280.0,
+        0.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         450.0,
         570.0,
         570.0,
@@ -163,18 +164,20 @@
         680.0,
         680.0,
         680.0,
-        680.0
+        680.0,
+        1290.0
       ],
       "Solar": [
         10.0,
         50.0,
         90.0,
-        130.0,
+        140.0,
         160.0,
         160.0,
         230.0,
         230.0,
-        230.0
+        230.0,
+        270.0
       ],
       "Wind": [
         0.0,
@@ -185,9 +188,11 @@
         160.0,
         160.0,
         160.0,
+        160.0,
         160.0
       ],
       "Bioenergy": [
+        50.0,
         50.0,
         50.0,
         50.0,

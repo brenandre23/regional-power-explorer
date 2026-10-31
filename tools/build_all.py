@@ -29,7 +29,9 @@ Pipelines:
             Runs after OWID pipeline.
   Comtrade — UN Comtrade HS 2716 API -> trade/{ISO3}.json for any country list
              Requires [api_tokens] comtrade key in config/api_tokens.ini
-  ENTSO-E — ENTSO-E API -> supply/{ISO3}.json for 36 countries
+  Reconcile — runs last: checks every supply/{ISO3}.json against Ember, replaces
+             incomplete ENTSO-E series, refreshes Ember ones, writes docs/SUPPLY_QA.md
+  ENTSO-E — ENTSO-E API -> entsoe/{ISO3}.json (fuel detail) + trade/{ISO3}.json for 36 countries
              First run ~30-60 min; subsequent runs use cached CSVs (instant).
              Cache: data-source/raw/ENTSOE/  (gitignored)
 """
@@ -48,7 +50,9 @@ from pipelines import (
     uzb_pipeline,
     comtrade_pipeline,
     entsoe_supply_pipeline,
+    reconcile_supply,
 )
+import check_notes
 
 if __name__ == '__main__':
     args = sys.argv[1:]
@@ -91,5 +95,15 @@ if __name__ == '__main__':
         print('=== ENTSO-E pipeline ===')
         entsoe_supply_pipeline.run(iso2_filter=entsoe_countries)
         print()
+
+    # Last: check every supply file against Ember and repair what the source
+    # pipelines left incomplete (see tools/pipelines/reconcile_supply.py).
+    print('=== Supply reconciliation (Ember check) ===')
+    reconcile_supply.run()
+    print()
+
+    print('=== Briefing notes check ===')
+    check_notes.main()
+    print()
 
     print('Done.')

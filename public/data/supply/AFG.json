@@ -1,9 +1,8 @@
 {
   "country": "Afghanistan",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,20 @@
         20.0,
         30.0,
         30.0,
+        30.0,
         30.0
+      ],
+      "Oil & Other Fossil": [
+        50.0,
+        60.0,
+        60.0,
+        80.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0
       ],
       "Hydro": [
         1000.0,
@@ -36,6 +49,7 @@
         990.0,
         850.0,
         740.0,
+        750.0,
         750.0
       ],
       "Solar": [
@@ -47,20 +61,11 @@
         70.0,
         80.0,
         90.0,
-        90.0
-      ],
-      "Oil": [
-        50.0,
-        60.0,
-        60.0,
-        80.0,
-        100.0,
-        100.0,
-        100.0,
-        100.0,
-        100.0
+        90.0,
+        110.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       4960.0,
       5540.0,
@@ -70,7 +75,8 @@
       6330.0,
       6760.0,
       6840.0,
-      7190.0
+      7190.0,
+      6820.0
     ]
   },
   "capacity": {
@@ -85,7 +91,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -97,16 +104,18 @@
         40.0,
         40.0,
         40.0,
+        40.0,
         40.0
       ],
-      "Other Fossil": [
-        240.0,
-        240.0,
-        240.0,
-        240.0,
-        240.0,
-        240.0,
-        240.0,
+      "Oil & Other Fossil": [
+        140.0,
+        140.0,
+        140.0,
+        140.0,
+        140.0,
+        140.0,
+        140.0,
+        140.0,
         240.0,
         240.0
       ],
@@ -119,6 +128,7 @@
         350.0,
         370.0,
         470.0,
+        470.0,
         470.0
       ],
       "Solar": [
@@ -130,18 +140,8 @@
         50.0,
         50.0,
         50.0,
-        50.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        50.0,
+        60.0
       ]
     }
   }

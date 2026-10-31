@@ -1,9 +1,8 @@
 {
   "country": "Honduras",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +25,20 @@
         50.0,
         60.0,
         70.0,
+        60.0,
         60.0
+      ],
+      "Oil & Other Fossil": [
+        4950.0,
+        4790.0,
+        4000.0,
+        3610.0,
+        4970.0,
+        4550.0,
+        4230.0,
+        4500.0,
+        5640.0,
+        5500.0
       ],
       "Hydro": [
         2320.0,
@@ -36,7 +49,8 @@
         2700.0,
         3770.0,
         3880.0,
-        3880.0
+        3880.0,
+        3800.0
       ],
       "Solar": [
         440.0,
@@ -47,7 +61,8 @@
         1110.0,
         1140.0,
         1040.0,
-        1040.0
+        1040.0,
+        1180.0
       ],
       "Wind": [
         670.0,
@@ -58,18 +73,8 @@
         710.0,
         770.0,
         690.0,
-        690.0
-      ],
-      "Oil": [
-        4950.0,
-        4790.0,
-        4000.0,
-        3610.0,
-        4970.0,
-        4550.0,
-        4230.0,
-        4500.0,
-        5640.0
+        690.0,
+        750.0
       ],
       "Bioenergy": [
         540.0,
@@ -80,20 +85,23 @@
         710.0,
         800.0,
         810.0,
-        830.0
+        830.0,
+        840.0
       ],
       "Other Renewables": [
-        540.0,
-        750.0,
-        900.0,
-        1020.0,
-        1270.0,
-        1020.0,
-        1150.0,
-        1150.0,
-        1180.0
+        0.0,
+        0.0,
+        90.0,
+        300.0,
+        300.0,
+        310.0,
+        350.0,
+        340.0,
+        350.0,
+        350.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       9160.0,
       9600.0,
@@ -103,6 +111,7 @@
       10420.0,
       11320.0,
       11520.0,
+      12630.0,
       12630.0
     ]
   },

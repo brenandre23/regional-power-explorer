@@ -1,9 +1,8 @@
 {
   "country": "Moldova",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +26,22 @@
         5820.0,
         6180.0,
         4630.0,
-        5440.0
+        5440.0,
+        5200.0,
+        1850.0
+      ],
+      "Oil & Other Fossil": [
+        10.0,
+        20.0,
+        20.0,
+        10.0,
+        0.0,
+        0.0,
+        40.0,
+        190.0,
+        300.0,
+        220.0,
+        220.0
       ],
       "Hydro": [
         260.0,
@@ -36,7 +52,9 @@
         280.0,
         320.0,
         290.0,
-        320.0
+        320.0,
+        320.0,
+        350.0
       ],
       "Solar": [
         0.0,
@@ -47,7 +65,9 @@
         0.0,
         10.0,
         50.0,
-        90.0
+        90.0,
+        100.0,
+        230.0
       ],
       "Wind": [
         0.0,
@@ -58,18 +78,9 @@
         50.0,
         80.0,
         140.0,
-        190.0
-      ],
-      "Oil": [
-        10.0,
-        20.0,
-        20.0,
-        10.0,
-        0.0,
-        0.0,
-        40.0,
         190.0,
-        300.0
+        210.0,
+        230.0
       ],
       "Bioenergy": [
         10.0,
@@ -80,20 +91,12 @@
         30.0,
         30.0,
         30.0,
-        10.0
-      ],
-      "Other Renewables": [
-        10.0,
         10.0,
         20.0,
-        30.0,
-        30.0,
-        30.0,
-        30.0,
-        30.0,
-        10.0
+        20.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       6060.0,
       5850.0,
@@ -103,7 +106,106 @@
       6350.0,
       6820.0,
       6170.0,
-      6430.0
+      6430.0,
+      6060.0,
+      5520.0
     ]
+  },
+  "capacity": {
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
+    "unit": "MW",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "fuels": {
+      "Coal": [
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0,
+        1400.0
+      ],
+      "Gas": [
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0,
+        1380.0
+      ],
+      "Hydro": [
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0
+      ],
+      "Solar": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        10.0,
+        60.0,
+        200.0,
+        400.0,
+        710.0
+      ],
+      "Wind": [
+        0.0,
+        0.0,
+        10.0,
+        30.0,
+        40.0,
+        40.0,
+        70.0,
+        120.0,
+        140.0,
+        160.0,
+        250.0
+      ],
+      "Bioenergy": [
+        0.0,
+        0.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        20.0,
+        20.0,
+        10.0,
+        10.0
+      ]
+    }
   }
 }

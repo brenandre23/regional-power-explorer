@@ -28,8 +28,10 @@ export function useLocalServer(build, name) {
         }
         setLocal([{ name, client }]);
       } catch (error) {
+        // A disposed bridge fails with "Not connected" (StrictMode's dev remount).
+        if (disposed) return;
         console.error(`Failed to initialise ${name} AI tool server`, error);
-        if (!disposed) setLocal([]);
+        setLocal([]);
       }
     })();
 

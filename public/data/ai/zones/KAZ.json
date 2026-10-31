@@ -1,0 +1,1 @@
+{"2":{"zones":{"KAZ_S":{"mw":3776.4,"plants":118,"byFuelMw":{"hydro":896.8,"solar":344.0,"coal":902.0,"gas":1477.0,"wind":156.6}},"KAZ_N":{"mw":14921.8,"plants":86,"byFuelMw":{"gas":518.0,"wind":191.0,"unknown":185.0,"hydro":1797.3,"coal":11910.5,"solar":320.0}}},"links":[["KAZ_N","KAZ_S"]]}}

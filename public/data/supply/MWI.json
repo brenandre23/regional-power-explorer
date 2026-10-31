@@ -1,9 +1,8 @@
 {
   "country": "Malawi",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        130.0,
+        130.0,
+        0.0,
+        330.0,
+        70.0,
+        10.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0
+      ],
       "Hydro": [
         1960.0,
         1940.0,
@@ -23,6 +35,7 @@
         1420.0,
         1670.0,
         1680.0,
+        1690.0,
         1690.0,
         1690.0,
         1690.0
@@ -36,31 +49,11 @@
         10.0,
         10.0,
         10.0,
-        10.0
-      ],
-      "Oil": [
-        130.0,
-        130.0,
-        0.0,
-        330.0,
-        70.0,
         10.0,
-        80.0,
-        80.0,
-        80.0
+        10.0
       ],
       "Bioenergy": [
         50.0,
-        50.0,
-        50.0,
-        50.0,
-        50.0,
-        50.0,
-        50.0,
-        50.0,
-        50.0
-      ],
-      "Other Renewables": [
         50.0,
         50.0,
         50.0,
@@ -72,6 +65,7 @@
         50.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       2150.0,
       2130.0,
@@ -79,6 +73,7 @@
       1790.0,
       1780.0,
       1730.0,
+      1810.0,
       1810.0,
       1810.0,
       1810.0
@@ -96,14 +91,16 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         30.0,
         40.0,
         90.0,
         120.0,
+        130.0,
         130.0,
         130.0,
         130.0,
@@ -119,6 +116,7 @@
         370.0,
         390.0,
         390.0,
+        390.0,
         390.0
       ],
       "Solar": [
@@ -127,12 +125,14 @@
         0.0,
         0.0,
         0.0,
-        10.0,
-        70.0,
-        110.0,
-        110.0
+        0.0,
+        60.0,
+        100.0,
+        100.0,
+        100.0
       ],
       "Bioenergy": [
+        20.0,
         20.0,
         20.0,
         20.0,

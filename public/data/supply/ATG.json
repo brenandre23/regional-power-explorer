@@ -1,9 +1,8 @@
 {
   "country": "Antigua and Barbuda",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        340.0,
+        340.0,
+        340.0,
+        350.0,
+        350.0,
+        330.0,
+        330.0,
+        340.0,
+        340.0,
+        340.0
+      ],
       "Solar": [
         10.0,
         0.0,
@@ -25,20 +37,11 @@
         20.0,
         20.0,
         20.0,
-        20.0
-      ],
-      "Oil": [
-        340.0,
-        340.0,
-        340.0,
-        350.0,
-        350.0,
-        330.0,
-        330.0,
-        340.0,
-        340.0
+        20.0,
+        30.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       350.0,
       340.0,
@@ -48,7 +51,8 @@
       350.0,
       350.0,
       360.0,
-      360.0
+      360.0,
+      370.0
     ]
   },
   "capacity": {

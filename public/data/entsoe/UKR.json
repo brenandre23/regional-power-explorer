@@ -1,0 +1,69 @@
+{
+  "country": "Ukraine",
+  "capacity": {
+    "source": "ENTSO-E Transparency Platform — Installed Generation Capacity Aggregated (A68)",
+    "unit": "MW",
+    "years": [
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "fuels": {
+      "Coal": [
+        18587.0,
+        18587.0,
+        18587.0,
+        0
+      ],
+      "Nuclear": [
+        13835.0,
+        13835.0,
+        13835.0,
+        13835.0
+      ],
+      "Gas": [
+        9359.5,
+        9359.5,
+        9359.5,
+        0
+      ],
+      "Hydro Reservoir": [
+        4636.7,
+        4636.7,
+        4636.7,
+        4636.7
+      ],
+      "Solar": [
+        5362.6,
+        5362.6,
+        5362.6,
+        0
+      ],
+      "Hydro Pumped Storage": [
+        1487.8,
+        1487.8,
+        1487.8,
+        1962.8
+      ],
+      "Wind": [
+        1111.2,
+        1111.2,
+        1111.2,
+        0
+      ],
+      "Biomass": [
+        199.5,
+        199.5,
+        199.5,
+        0
+      ],
+      "Hydro RoR": [
+        192.1,
+        192.1,
+        192.1,
+        0
+      ]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+name: Check derived data
+
+# The AI assistant's summaries (public/data/ai/) and the region page summaries
+# (public/data/cache/region_summary_*.json) are derived from the committed plant,
+# line and zone files. Regenerate them and fail if they differ from what is
+# committed, so the assistant and the map can't drift apart. Both scripts use
+# only the Python standard library.
+
+on:
+  pull_request:
+    paths:
+      - 'public/data/**'
+      - 'tools/prepare_ai.py'
+      - 'tools/prepare_region_summary.py'
+  push:
+    branches: [main]
+    paths:
+      - 'public/data/**'
+      - 'tools/prepare_ai.py'
+      - 'tools/prepare_region_summary.py'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Regenerate derived files
+        run: |
+          python tools/prepare_region_summary.py
+          python tools/prepare_ai.py
+
+      - name: Compare with the committed files
+        run: |
+          changed=$(git status --porcelain public/data/ai public/data/cache)
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            echo "::error::Derived data is out of date. Run 'python tools/prepare_region_summary.py' and 'python tools/prepare_ai.py', then commit public/data/ai and public/data/cache/region_summary_*.json."
+            exit 1
+          fi
+          echo "Derived data matches the committed files."

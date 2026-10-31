@@ -1,7 +1,14 @@
 import { dataPath } from '../../utils/paths';
 import { fetchData } from '../../utils/dataCache';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { getT } from '../../constants';
+import ChartCaption, { getSourceMeta } from '../ChartCaption';
+import {
+  downloadBlob, GRANULARITIES, GRANULARITY_LABEL, AXIS_TITLE,
+  dayOf, hourTimestampLabel, fmtValue, getPeriods, periodOptionLabel,
+  defaultRange, rangeLabel, computeStats, getChartPoints,
+} from './chartHelpers';
+import { KpiCard, SeriesChart, ChartTooltip } from './MarketChartComponents';
 
 // Useful external electricity-demand data sources
 const DEMAND_LINKS = [
@@ -42,18 +49,6 @@ const ENTSOE_ISO3 = new Set(['ROU','BGR','TUR','ALB','BIH','MKD','MNE','SRB','KO
 
 const PROFILE_EUROPEAN = [42,38,35,33,32,33,38,56,75,82,85,86,87,87,85,83,84,88,93,96,91,78,65,52];
 
-function getSourceMeta(src) {
-  if (!src) return { short: '—', rel: null, note: '' };
-  const s = src.toLowerCase();
-  if (s.includes('entso-e'))                      return { short: 'ENTSO-E',          rel: 'high',   note: 'Official hourly metered data' };
-  if (s.includes('eapp'))                         return { short: 'EAPP Secretariat', rel: 'high',   note: 'Official annual interconnection statistics' };
-  if (s.includes('teias') || s.includes('epias')) return { short: 'TEIAS/EPIAS',      rel: 'high',   note: 'Official Turkish TSO data' };
-  if (s.includes('owid') || s.includes('ember'))  return { short: 'OWID/Ember',       rel: 'medium', note: 'Cross-validated estimates; small countries may be approximate' };
-  if (s.includes('comtrade'))                     return { short: 'Comtrade HS 2716', rel: 'medium', note: 'Customs declarations; coverage varies by country' };
-  if (s.includes('wdi') || s.includes('world bank')) return { short: 'WB WDI',        rel: 'medium', note: 'Derived from per-capita electricity use × population' };
-  const short = src.split('—')[0].split('(')[0].trim();
-  return { short: short.length > 28 ? short.slice(0, 25) + '…' : short, rel: 'medium', note: '' };
-}
 
 const _REL_STYLE = {
   high:   { color: '#1A9060', label: 'Official'  },
@@ -80,14 +75,6 @@ function SourceBadge({ source, t }) {
       )}
     </span>
   );
-}
-
-function downloadBlob(content, filename, type = 'application/octet-stream') {
-  const blob = new Blob([content], { type });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function linearFit(pts) {
@@ -197,7 +184,11 @@ function ProfileChart({ profile, color, t }) {
   );
 }
 
-export default function LoadTab({ iso, theme }) {
+// ── Annual demand — the Load tab's original (and still default) content:
+// KPI cards, TEİAŞ/WDI trend chart with the 2035 linear projection, and the
+// ENTSO-E daily load-shape chart. Unchanged from before the Real-time
+// consumption sub-tab was added.
+function AnnualDemand({ iso, theme }) {
   const t = getT(theme);
   const [pts,     setPts]     = useState(null); // [[year, TWh]]
   const [peakMW,  setPeakMW]  = useState(null); // from supply capacity data if available
@@ -422,6 +413,232 @@ export default function LoadTab({ iso, theme }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+const RT_CONS_COLOR = '#2E8B7E';
+
+// ── Real-time consumption — EPIAS "rt-cons", hourly system-level consumption
+// published ~2 hours behind. Reuses the exact Yearly/Monthly/Daily/Hourly
+// chart machinery MarketTab's Prices/Quantity sub-tabs use (shared via
+// chartHelpers.jsx / MarketChartComponents.jsx), just with a single series
+// and no currency toggle.
+function RealTimeConsumption({ iso, theme, marketData }) {
+  const t = getT(theme);
+  const [granularity,  setGranularity] = useState('multiyear');
+  const [periodStart,  setPeriodStart] = useState(null);
+  const [periodEnd,    setPeriodEnd]   = useState(null);
+  const [exportScope,  setExportScope] = useState('selected');
+  const [tip,          setTip]         = useState(null);
+  const chartRef = useRef(null);
+
+  const block = marketData?.rt_cons ?? null;
+  const unit  = block?.unit || 'MWh';
+
+  const periods = useMemo(() => getPeriods(block, granularity), [block, granularity]);
+
+  const prevGranularityRef = useRef(granularity);
+  useEffect(() => {
+    const [defStart, defEnd] = defaultRange(periods, granularity);
+    if (prevGranularityRef.current !== granularity) {
+      prevGranularityRef.current = granularity;
+      setPeriodStart(defStart);
+      setPeriodEnd(defEnd);
+      return;
+    }
+    setPeriodStart(prev => (prev && periods.includes(prev)) ? prev : defStart);
+    setPeriodEnd(prev => (prev && periods.includes(prev)) ? prev : defEnd);
+  }, [periods, granularity]);
+
+  const stats       = useMemo(() => computeStats(block, granularity, periodStart, periodEnd), [block, granularity, periodStart, periodEnd]);
+  const chartPoints = useMemo(() => getChartPoints(block, granularity, periodStart, periodEnd), [block, granularity, periodStart, periodEnd]);
+  const latestHourly = useMemo(() => {
+    if (!block?.hourly) return null;
+    const keys = Object.keys(block.hourly);
+    if (!keys.length) return null;
+    const latestKey = keys.reduce((a, b) => (a > b ? a : b));
+    return { ts: latestKey, value: block.hourly[latestKey] };
+  }, [block]);
+
+  const toggleBtnStyle = active => ({
+    fontSize: '0.55rem', letterSpacing: '0.5px', textTransform: 'uppercase',
+    padding: '3px 8px', borderRadius: 3, cursor: 'pointer', fontFamily: 'inherit',
+    border: `1px solid ${active ? 'rgba(74,143,204,0.6)' : t.panelBorder}`,
+    backgroundColor: active ? 'rgba(74,143,204,0.1)' : 'transparent',
+    color: active ? t.lbl : t.lblMuted,
+  });
+
+  const selectStyle = {
+    flex: 1, fontSize: '0.6rem', padding: '3px 6px', borderRadius: 4, fontFamily: 'inherit',
+    border: `1px solid ${t.panelBorder}`, backgroundColor: t.panel, color: t.lbl, outline: 'none',
+  };
+
+  const dlBtnStyle = {
+    fontSize: '0.52rem', letterSpacing: '0.5px', padding: '4px 9px', borderRadius: 3,
+    cursor: 'pointer', fontFamily: 'inherit', border: `1px solid ${t.panelBorder}`,
+    backgroundColor: 'transparent', color: t.lblMuted,
+  };
+
+  const handleHover = (i, e) => {
+    if (i === null) { setTip(null); return; }
+    if (!chartRef.current) return;
+    const r = chartRef.current.getBoundingClientRect();
+    setTip({ i, x: e.clientX - r.left, y: e.clientY - r.top });
+  };
+
+  const handleDownload = () => {
+    if (!block || !periods.length) return;
+    const [fromKey, toKey] = exportScope === 'full'
+      ? [periods[0], periods[periods.length - 1]]
+      : [periodStart, periodEnd];
+    if (!fromKey || !toKey) return;
+    let header, keys, rows;
+    if (granularity === 'multiyear') {
+      keys = Object.keys(block.yearly.mean).filter(k => k >= fromKey && k <= toKey).sort();
+      header = 'year,mean,min,max';
+      rows = keys.map(k => [k, block.yearly.mean[k], block.yearly.min[k], block.yearly.max[k]].join(','));
+    } else if (granularity === 'year') {
+      keys = Object.keys(block.monthly.mean).filter(k => k >= fromKey && k <= toKey).sort();
+      header = 'month,mean,min,max';
+      rows = keys.map(k => [k, block.monthly.mean[k], block.monthly.min[k], block.monthly.max[k]].join(','));
+    } else if (granularity === 'month') {
+      keys = Object.keys(block.daily.mean).filter(k => k >= fromKey && k <= toKey).sort();
+      header = 'date,mean,min,max';
+      rows = keys.map(k => [k, block.daily.mean[k], block.daily.min[k], block.daily.max[k]].join(','));
+    } else {
+      keys = Object.keys(block.hourly).filter(k => {
+        const day = dayOf(k);
+        return day >= fromKey && day <= toKey;
+      }).sort();
+      header = 'timestamp,consumption';
+      rows = keys.map(k => [k, block.hourly[k]].join(','));
+    }
+    downloadBlob([header, ...rows].join('\n'), `realtime_consumption_${granularity}_${exportScope}_${iso}.csv`, 'text/csv');
+  };
+
+  if (!block) return <p style={{ fontSize: '0.7rem', color: t.lblMuted, marginTop: 8, fontStyle: 'italic' }}>No real-time consumption data available for this country.</p>;
+
+  const kpi1Label = `Average · ${rangeLabel(granularity, periodStart, periodEnd)}`;
+
+  return (
+    <div>
+      {/* Granularity toggle */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+        {GRANULARITIES.map(([g, lbl]) => (
+          <button key={g} onClick={() => { setGranularity(g); setTip(null); }}
+            style={toggleBtnStyle(granularity === g)}>{lbl}</button>
+        ))}
+      </div>
+
+      {/* Range nav — From/To, each constrained by the other's current value */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span style={{ fontSize: '0.5rem', color: t.lblMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>From</span>
+        <select
+          value={periodStart ?? ''}
+          onChange={e => { setPeriodStart(e.target.value); setTip(null); }}
+          style={selectStyle}
+        >
+          {periods.filter(p => !periodEnd || p <= periodEnd).map(p => (
+            <option key={p} value={p}>{periodOptionLabel(granularity, p)}</option>
+          ))}
+        </select>
+        <span style={{ fontSize: '0.5rem', color: t.lblMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>To</span>
+        <select
+          value={periodEnd ?? ''}
+          onChange={e => { setPeriodEnd(e.target.value); setTip(null); }}
+          style={selectStyle}
+        >
+          {periods.filter(p => !periodStart || p >= periodStart).map(p => (
+            <option key={p} value={p}>{periodOptionLabel(granularity, p)}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* KPI cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 14 }}>
+        <KpiCard label={kpi1Label} value={fmtValue(stats?.avg)} unit={unit}
+          sub={stats ? `Min ${fmtValue(stats.min)} · Max ${fmtValue(stats.max)}` : 'No data'} t={t} />
+        <KpiCard label="Latest Consumption" value={fmtValue(latestHourly?.value)} unit={unit}
+          sub={latestHourly ? hourTimestampLabel(latestHourly.ts) : 'No data'} t={t} />
+      </div>
+
+      {/* Chart */}
+      {chartPoints.points.length ? (
+        <div ref={chartRef} style={{ position: 'relative' }}>
+          <SeriesChart mode={chartPoints.mode} points={chartPoints.points} color={RT_CONS_COLOR}
+            unit={unit} t={t} hoveredI={tip?.i ?? null} onHover={handleHover} xAxisLabel={AXIS_TITLE[granularity]} />
+          <ChartTooltip tip={tip} points={chartPoints.points} unit={unit} t={t} valueLabel="Consumption" />
+        </div>
+      ) : (
+        <p style={{ fontSize: '0.62rem', color: t.lblMuted, fontStyle: 'italic', padding: '12px 0' }}>No data for this period.</p>
+      )}
+
+      <ChartCaption
+        source={marketData.source}
+        t={t}
+        extra="Hourly consumption as published by EPİAŞ, about 2 hours behind. Recent values may be revised. This is a separate, real-time EPİAŞ measure — not the same series as the annual TEİAŞ demand shown under Annual Demand."
+      />
+
+      {/* CSV download */}
+      <div style={{ marginTop: 16, borderTop: `1px solid ${t.panelBorder}`, paddingTop: 12 }}>
+        <span style={{ fontSize: '0.47rem', letterSpacing: '2px', fontWeight: 700, color: t.lblMuted, textTransform: 'uppercase', display: 'block', marginBottom: 7 }}>
+          Export Data
+        </span>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 7 }}>
+          <button onClick={() => setExportScope('selected')} style={toggleBtnStyle(exportScope === 'selected')}>Selected Range</button>
+          <button onClick={() => setExportScope('full')} style={toggleBtnStyle(exportScope === 'full')}>Full Range</button>
+        </div>
+        <p style={{ fontSize: '0.46rem', color: t.lblMuted, margin: '0 0 7px' }}>
+          {exportScope === 'full' && periods.length
+            ? `Full range · ${periodOptionLabel(granularity, periods[0])} – ${periodOptionLabel(granularity, periods[periods.length - 1])}`
+            : `Selected range · ${rangeLabel(granularity, periodStart, periodEnd)}`}
+        </p>
+        <button style={dlBtnStyle} onClick={handleDownload}>Real-Time Consumption {GRANULARITY_LABEL[granularity]} CSV</button>
+      </div>
+    </div>
+  );
+}
+
+const LOAD_SUB_TABS = [['annual', 'Annual demand'], ['realtime', 'Real-time consumption']];
+
+export default function LoadTab({ iso, theme }) {
+  const t = getT(theme);
+  const [loadSubTab, setLoadSubTab] = useState('annual');
+  const [marketData, setMarketData] = useState(null);
+
+  // Only used to decide whether the Real-time consumption sub-tab exists for
+  // this country (same availability pattern as MarketTab: fetch and see
+  // whether anything comes back) — reuses the same market/{iso}.json
+  // MarketTab already fetches, rather than a new file, since rt_cons is just
+  // one more series alongside the price/quantity ones already there.
+  useEffect(() => {
+    setLoadSubTab('annual');
+    fetchData(dataPath(`market/${iso}.json`))
+      .then(d => setMarketData(d))
+      .catch(() => setMarketData(null));
+  }, [iso]);
+
+  const hasRtCons = !!Object.keys(marketData?.rt_cons?.hourly || {}).length;
+
+  const subTabBtnStyle = active => ({
+    fontSize: '0.56rem', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: active ? 700 : 400,
+    padding: '0 2px 7px', cursor: 'pointer', fontFamily: 'inherit',
+    background: 'none', border: 'none', borderBottom: `2px solid ${active ? 'rgba(74,143,204,0.9)' : 'transparent'}`,
+    color: active ? t.lbl : t.lblMuted,
+  });
+
+  return (
+    <div>
+      {hasRtCons && (
+        <div style={{ display: 'flex', gap: 16, marginBottom: 14, borderBottom: `1px solid ${t.panelBorder}` }}>
+          {LOAD_SUB_TABS.map(([id, lbl]) => (
+            <button key={id} onClick={() => setLoadSubTab(id)} style={subTabBtnStyle(loadSubTab === id)}>{lbl}</button>
+          ))}
+        </div>
+      )}
+      {loadSubTab === 'annual' && <AnnualDemand iso={iso} theme={theme} />}
+      {loadSubTab === 'realtime' && hasRtCons && <RealTimeConsumption iso={iso} theme={theme} marketData={marketData} />}
     </div>
   );
 }

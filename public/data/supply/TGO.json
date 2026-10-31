@@ -1,9 +1,8 @@
 {
   "country": "Togo",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         460.0,
         480.0,
         650.0,
-        520.0
+        520.0,
+        500.0
+      ],
+      "Oil & Other Fossil": [
+        200.0,
+        710.0,
+        470.0,
+        180.0,
+        20.0,
+        60.0,
+        70.0,
+        70.0,
+        0.0,
+        0.0
       ],
       "Hydro": [
         60.0,
@@ -35,6 +48,7 @@
         120.0,
         80.0,
         90.0,
+        80.0,
         80.0,
         80.0
       ],
@@ -47,20 +61,11 @@
         10.0,
         70.0,
         100.0,
-        110.0
-      ],
-      "Oil": [
-        200.0,
-        710.0,
-        470.0,
-        180.0,
-        20.0,
-        60.0,
-        70.0,
-        70.0,
-        0.0
+        110.0,
+        130.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       1010.0,
       1690.0,
@@ -70,7 +75,8 @@
       1420.0,
       1510.0,
       2030.0,
-      2250.0
+      2250.0,
+      2210.0
     ]
   },
   "capacity": {
@@ -85,7 +91,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -97,9 +104,11 @@
         20.0,
         70.0,
         70.0,
+        70.0,
         70.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        150.0,
         150.0,
         150.0,
         150.0,
@@ -119,6 +128,7 @@
         70.0,
         70.0,
         70.0,
+        70.0,
         70.0
       ],
       "Solar": [
@@ -129,6 +139,7 @@
         10.0,
         10.0,
         60.0,
+        70.0,
         70.0,
         70.0
       ]

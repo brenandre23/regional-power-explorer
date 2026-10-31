@@ -1,9 +1,8 @@
 {
   "country": "Haiti",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        950.0,
+        1010.0,
+        930.0,
+        850.0,
+        890.0,
+        880.0,
+        900.0,
+        820.0,
+        660.0,
+        700.0
+      ],
       "Hydro": [
         80.0,
         70.0,
@@ -25,20 +37,11 @@
         140.0,
         130.0,
         190.0,
-        190.0
-      ],
-      "Oil": [
-        950.0,
-        1010.0,
-        930.0,
-        850.0,
-        890.0,
-        880.0,
-        900.0,
-        820.0,
-        660.0
+        190.0,
+        160.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       1030.0,
       1080.0,
@@ -48,7 +51,8 @@
       1020.0,
       1030.0,
       1010.0,
-      850.0
+      850.0,
+      860.0
     ]
   },
   "capacity": {
@@ -63,10 +67,12 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        400.0,
         400.0,
         400.0,
         400.0,
@@ -86,29 +92,8 @@
         80.0,
         80.0,
         80.0,
+        80.0,
         80.0
-      ],
-      "Solar": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
       ]
     }
   }

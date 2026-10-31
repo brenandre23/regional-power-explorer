@@ -1,0 +1,108 @@
+{
+  "country": "Norway",
+  "generation": {
+    "source": "ENTSO-E harmonised statistics — monthly domestic values (net generation), summed by year",
+    "unit": "GWh",
+    "years": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "fuels": {
+      "Hydro Reservoir": [
+        114595.2,
+        126908.1,
+        123211.3,
+        102560.1,
+        106670.1,
+        106184.2,
+        113464.9
+      ],
+      "Hydro RoR": [
+        10408.1,
+        11295.4,
+        12699.6,
+        24273.7,
+        27901.2,
+        30187.4,
+        28113.1
+      ],
+      "Wind": [
+        5231.5,
+        9283.4,
+        10701.0,
+        14817.8,
+        13901.3,
+        14531.2,
+        13491.6
+      ],
+      "Hydro Pumped Storage": [
+        null,
+        2585.7,
+        7085.6,
+        1547.0,
+        1751.1,
+        2183.7,
+        2484.0
+      ],
+      "Gas": [
+        2961.5,
+        2042.8,
+        740.3,
+        1250.7,
+        1462.5,
+        1629.1,
+        1088.2
+      ],
+      "Other": [
+        190.6,
+        384.8,
+        341.4,
+        399.4,
+        429.4,
+        398.4,
+        526.6
+      ],
+      "Waste": [
+        null,
+        144.0,
+        234.1,
+        244.3,
+        278.4,
+        305.2,
+        271.4
+      ],
+      "Solar": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        2.3,
+        9.1
+      ],
+      "Wind Offshore": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        7.8
+      ],
+      "Biomass": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0.1
+      ]
+    }
+  }
+}

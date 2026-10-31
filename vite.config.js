@@ -32,6 +32,8 @@ function iisConfig() {
       <mimeMap fileExtension=".json" mimeType="application/json" />
       <remove fileExtension=".woff2" />
       <mimeMap fileExtension=".woff2" mimeType="font/woff2" />
+      <remove fileExtension=".pmtiles" />
+      <mimeMap fileExtension=".pmtiles" mimeType="application/octet-stream" />
     </staticContent>
   </system.webServer>
 </configuration>

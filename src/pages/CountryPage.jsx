@@ -10,6 +10,7 @@ import { getT, FUEL_COLORS, VOLTAGE_BRACKETS, kvFilterWithFloor, bracketFor, LIN
 import LayerPanel from '../components/LayerPanel';
 import MapChat from '../chat/LazyMapChat';
 import ExportControl from '../components/ExportControl';
+import WorldButton from '../components/WorldButton';
 import { powerLegend } from '../utils/exportLegend';
 import CountryOverview from '../components/CountryOverview';
 import REResourcesTab from '../components/tabs/REResourcesTab';
@@ -106,7 +107,6 @@ export default function CountryPage() {
   const [minKv,            setMinKv]            = useState(0);
   const [kvFloor,          setKvFloor]          = useState(110);
   const [presentKvs,       setPresentKvs]       = useState(null);
-  const [countryCenter,      setCountryCenter]      = useState(null);
   const [countryReady,       setCountryReady]       = useState(false);
   const [activeTab,          setActiveTab]          = useState('overview');
   const [panelWidth,         setPanelWidth]         = useState(PANEL_WIDTH_DEFAULT); // same starting size as RegionPage
@@ -247,7 +247,7 @@ export default function CountryPage() {
     setFuelsOff(new Set()); setStatusOff(new Set()); setKvsOff(new Set());
     setLinesOn(true); setPlantsOn(true); setSubsOn(false); setMinMw(100); setCircleScale(1.0);
     setLcCircleScale(1.0);
-    setPlantSource('gem'); setGppdAvailable(null); setGemAvailable(null); setCountryCenter(null);
+    setPlantSource('gem'); setGppdAvailable(null); setGemAvailable(null);
     setZoneMode('plain'); setNZones(null); setZoneLabelsOn(false);
     setHasNote(null); setNoteOpen(false); setCountryReady(false);
     setMarketAvailable(null);
@@ -287,10 +287,6 @@ export default function CountryPage() {
       const bounds = boundsFor(bboxes, 'countries', iso, 0.8);
       if (disposed || !bounds) return;
       map.fitBounds(bounds, { padding: 60, duration: 0, maxZoom: 9 });
-      setCountryCenter({
-        lon: (bounds[0][0] + bounds[1][0]) / 2,
-        lat: (bounds[0][1] + bounds[1][1]) / 2,
-      });
     }).catch(err => console.error('bboxes', err));
 
     const popup = new maplibregl.Popup({
@@ -460,6 +456,10 @@ export default function CountryPage() {
             props: { ...props, voltageLabel: v ? `${Math.round(v / 1000)} kV` : bracket.label },
             km:    lineKm(coords),
           });
+        } else if (countryFeatureRef.current
+            && !pointInFeature([e.lngLat.lng, e.lngLat.lat], countryFeatureRef.current)) {
+          // A click outside the country goes back out to its region.
+          navigate(`/region/${region.id}`);
         } else {
           setSelFeature(null);
         }
@@ -1364,15 +1364,22 @@ export default function CountryPage() {
           </div>
         )}
 
-        {/* Equal Earth export — top-left of the map (under Legend & Filter on phones) */}
-        <ExportControl
-          mapRef={mapRef} ready={mapReady} t={t} compact={isMobile}
-          style={isMobile ? { top: zonesIndex !== null ? 104 : 56, left: 12 } : { top: 10, left: 12 }}
-          title={`Regional Power Explorer — ${country.name}`}
-          fileName={`regional-power-explorer-${iso}`}
-          defaultBasemap={wbView.canvas}
-          legend={() => powerLegend({ presentFuels, fuelsOff, presentKvs, theme })}
-        />
+        {/* Back to the world view, and the Equal Earth export — top-left of the
+            map (under Legend & Filter on phones) */}
+        <div style={{
+          position: 'absolute', zIndex: 60, display: 'flex', alignItems: 'flex-start', gap: 6,
+          ...(isMobile ? { top: zonesIndex !== null ? 112 : 56, left: 12 } : { top: 10, left: 12 }),
+        }}>
+          <WorldButton t={t} compact={isMobile} />
+          <ExportControl
+            mapRef={mapRef} ready={mapReady} t={t} compact={isMobile}
+            style={{ position: 'relative', left: 0 }}
+            title={`Regional Power Explorer — ${country.name}`}
+            fileName={`regional-power-explorer-${iso}`}
+            defaultBasemap={wbView.canvas}
+            legend={() => powerLegend({ presentFuels, fuelsOff, presentKvs, theme })}
+          />
+        </div>
 
         {/* ── Map disclaimer ── */}
         <div style={{
@@ -1698,7 +1705,7 @@ export default function CountryPage() {
           )}
 
           {activeTab === 're' && (
-            <REResourcesTab center={countryCenter} theme={theme} />
+            <REResourcesTab iso={iso} theme={theme} />
           )}
 
           {activeTab === 'load' && (

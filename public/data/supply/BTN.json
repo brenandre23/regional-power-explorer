@@ -1,9 +1,8 @@
 {
   "country": "Bhutan",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Hydro": [
@@ -25,9 +25,11 @@
         11370.0,
         10820.0,
         10770.0,
-        11160.0
+        11160.0,
+        11000.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       2130.0,
       2200.0,
@@ -37,7 +39,8 @@
       6190.0,
       11650.0,
       11600.0,
-      11990.0
+      11990.0,
+      12460.0
     ]
   },
   "capacity": {
@@ -52,10 +55,12 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        10.0,
         10.0,
         10.0,
         10.0,
@@ -75,29 +80,8 @@
         2330.0,
         2330.0,
         2330.0,
-        2330.0
-      ],
-      "Solar": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        2330.0,
+        2450.0
       ]
     }
   }

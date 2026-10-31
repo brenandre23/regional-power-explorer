@@ -1,9 +1,8 @@
 {
   "country": "Iceland",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Hydro": [
@@ -25,13 +25,27 @@
         12920.0,
         13580.0,
         13940.0,
-        14100.0
+        14100.0,
+        13460.0
+      ],
+      "Solar": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        10.0
       ],
       "Wind": [
         10.0,
         10.0,
         10.0,
         0.0,
+        10.0,
         10.0,
         10.0,
         10.0,
@@ -47,9 +61,11 @@
         5960.0,
         5800.0,
         5920.0,
-        5700.0
+        5700.0,
+        5570.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       18550.0,
       18170.0,
@@ -59,7 +75,62 @@
       18890.0,
       19390.0,
       19870.0,
-      19810.0
+      19810.0,
+      19050.0
     ]
+  },
+  "capacity": {
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
+    "unit": "MW",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "fuels": {
+      "Oil & Other Fossil": [
+        120.0,
+        120.0,
+        120.0,
+        120.0,
+        120.0,
+        120.0,
+        130.0,
+        130.0,
+        70.0,
+        70.0
+      ],
+      "Hydro": [
+        1990.0,
+        1990.0,
+        1990.0,
+        2100.0,
+        2100.0,
+        2110.0,
+        2110.0,
+        2110.0,
+        2150.0,
+        2130.0
+      ],
+      "Solar": [
+        0.0,
+        0.0,
+        0.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0
+      ]
+    }
   }
 }

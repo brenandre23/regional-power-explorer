@@ -34,9 +34,10 @@ Outputs (public/data/geo/):
                                 detail -- only for countries that belong to a
                                 region, the only ones with a country page
     region/<id>.topo.json       a region's member countries plus its areas, detail
-    bboxes.json               [minLon, minLat, maxLon, maxLat] per country and
+    bboxes.json               [west, south, east, north] per country and
                               region, for fitBounds -- so no page has to walk
-                              geometry to frame itself
+                              geometry to frame itself; east is past 180 for
+                              what crosses the antimeridian
 
 Feature properties (the contract src/utils/basemap.js and the pages rely on):
     ISO_A3     ISO 3166-1 alpha-3, the key every page joins on ("" on areas)
@@ -292,21 +293,33 @@ def is_area(f):
     return f["properties"].get("STATUS") == "non-determined"
 
 
-def bbox(geometry):
+def lon_span(xs):
+    """The narrowest [west, east] covering every longitude in xs. Across the
+    antimeridian east is past 180 (Fiji: 177 to 182), which fitBounds frames
+    as one piece; plain min/max would give -180 to 180, the whole world."""
+    xs = sorted(set(xs))
+    # The covering span starts after the widest gap between neighbours,
+    # counting the gap that runs from the last back round to the first.
+    gap, start = xs[0] + 360 - xs[-1], 0
+    for i in range(1, len(xs)):
+        if xs[i] - xs[i - 1] > gap:
+            gap, start = xs[i] - xs[i - 1], i
+    if start == 0:
+        return xs[0], xs[-1]
+    return xs[start], xs[start - 1] + 360
+
+
+def bbox_of(geometries):
     xs, ys = [], []
-    for poly in polygons(geometry):
-        for x, y in poly[0]:        # outer ring is enough for an extent
-            xs.append(x)
-            ys.append(y)
-    return [round(min(xs), 4), round(min(ys), 4), round(max(xs), 4), round(max(ys), 4)]
-
-
-def union_bbox(boxes):
-    boxes = [b for b in boxes if b]
-    if not boxes:
+    for g in geometries:
+        for poly in polygons(g):
+            for x, y in poly[0]:    # outer ring is enough for an extent
+                xs.append(x)
+                ys.append(y)
+    if not xs:
         return None
-    return [min(b[0] for b in boxes), min(b[1] for b in boxes),
-            max(b[2] for b in boxes), max(b[3] for b in boxes)]
+    west, east = lon_span(xs)
+    return [round(west, 4), round(min(ys), 4), round(east, 4), round(max(ys), 4)]
 
 
 def collection(features):
@@ -508,14 +521,14 @@ def main():
     boxes = {
         "source": SOURCE_NAME, "item": SOURCE_ITEM,
         "tolerance": args.tolerance, "world_tolerance": args.world_tolerance,
-        "countries": {iso: bbox(f["geometry"]) for iso, f in by_iso.items()},
+        "countries": {iso: bbox_of([f["geometry"]]) for iso, f in by_iso.items()},
         "regions": {},
     }
     for r in regions:
         if r.get("type") == "meta":
             continue
-        boxes["regions"][r["id"]] = union_bbox(
-            [boxes["countries"].get(c["iso"]) for c in r.get("countries", [])])
+        boxes["regions"][r["id"]] = bbox_of(
+            [by_iso[c["iso"]]["geometry"] for c in r.get("countries", []) if c["iso"] in by_iso])
 
     if args.dry_run:
         log("dry run: nothing written")

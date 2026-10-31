@@ -1,9 +1,8 @@
 {
   "country": "Turkmenistan",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,8 @@
         25760.0,
         28390.0,
         32590.0,
-        32590.0
+        32590.0,
+        33000.0
       ],
       "Hydro": [
         0.0,
@@ -36,9 +37,11 @@
         0.0,
         10.0,
         10.0,
+        10.0,
         10.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       19330.0,
       19330.0,
@@ -48,7 +51,8 @@
       22560.0,
       25200.0,
       23600.0,
-      23600.0
+      23600.0,
+      24010.0
     ]
   },
   "capacity": {
@@ -63,7 +67,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -75,18 +80,8 @@
         6520.0,
         6950.0,
         6950.0,
+        7090.0,
         7090.0
-      ],
-      "Hydro": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
       ]
     }
   }

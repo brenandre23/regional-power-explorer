@@ -1,9 +1,8 @@
 {
   "country": "Singapore",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Coal": [
@@ -24,6 +25,8 @@
         650.0,
         530.0,
         670.0,
+        570.0,
+        570.0,
         570.0,
         570.0
       ],
@@ -36,7 +39,22 @@
         50840.0,
         52940.0,
         52540.0,
-        53060.0
+        53060.0,
+        54930.0,
+        54810.0
+      ],
+      "Oil & Other Fossil": [
+        330.0,
+        360.0,
+        370.0,
+        320.0,
+        220.0,
+        210.0,
+        560.0,
+        1480.0,
+        1090.0,
+        1170.0,
+        1470.0
       ],
       "Solar": [
         0.0,
@@ -47,18 +65,9 @@
         300.0,
         400.0,
         670.0,
-        940.0
-      ],
-      "Oil": [
-        330.0,
-        360.0,
-        370.0,
-        320.0,
-        220.0,
-        210.0,
-        560.0,
-        1480.0,
-        1090.0
+        940.0,
+        1280.0,
+        1640.0
       ],
       "Bioenergy": [
         1460.0,
@@ -69,20 +78,12 @@
         1190.0,
         1220.0,
         1660.0,
-        1660.0
-      ],
-      "Other Renewables": [
-        1460.0,
-        1410.0,
-        1390.0,
-        1350.0,
-        1320.0,
-        1190.0,
-        1220.0,
+        1660.0,
         1660.0,
         1660.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       50280.0,
       51590.0,
@@ -92,7 +93,9 @@
       53070.0,
       55790.0,
       57100.0,
-      57400.0
+      57400.0,
+      59630.0,
+      60440.0
     ]
   },
   "capacity": {
@@ -107,21 +110,25 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
-        10800.0,
-        10800.0,
-        10880.0,
-        10880.0,
-        10880.0,
-        10880.0,
-        10880.0,
-        10880.0,
-        10880.0
+        10830.0,
+        10830.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        10910.0,
+        11700.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         220.0,
         220.0,
         220.0,
@@ -130,7 +137,9 @@
         180.0,
         250.0,
         510.0,
-        240.0
+        240.0,
+        210.0,
+        210.0
       ],
       "Solar": [
         50.0,
@@ -141,7 +150,9 @@
         330.0,
         480.0,
         630.0,
-        920.0
+        920.0,
+        1210.0,
+        1520.0
       ],
       "Bioenergy": [
         40.0,
@@ -149,6 +160,8 @@
         40.0,
         40.0,
         40.0,
+        30.0,
+        50.0,
         40.0,
         50.0,
         40.0,

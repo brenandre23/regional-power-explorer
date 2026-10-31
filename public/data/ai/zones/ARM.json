@@ -1,0 +1,1 @@
+{"1":{"zones":{"ARM_1":{"mw":4678.4,"plants":78,"byFuelMw":{"hydro":702.8,"solar":63.0,"nuclear":408.0,"wind":2.6,"gas":3502.0}}},"links":[]},"2":{"zones":{"ARM_2":{"mw":247.0,"plants":7,"byFuelMw":{"hydro":247.0}},"ARM_1":{"mw":4431.4,"plants":71,"byFuelMw":{"hydro":455.8,"solar":63.0,"nuclear":408.0,"wind":2.6,"gas":3502.0}}},"links":[["ARM_1","ARM_2"]]}}

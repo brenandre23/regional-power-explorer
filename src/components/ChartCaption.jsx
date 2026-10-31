@@ -7,16 +7,20 @@
 // reliability vocabulary.
 
 // Reliability tiers:
-//   high   — metered/official statistics published by the system operator
+//   high   — official statistics (national statistics, or the system operator's own)
 //   medium — declared or modelled figures; right order of magnitude, not audited
 //   low    — partial coverage; treat as indicative only
 export function getSourceMeta(src) {
   if (!src) return { short: '—', rel: null, note: '' };
   const s = src.toLowerCase();
-  if (s.includes('entso-e'))                      return { short: 'ENTSO-E',          rel: 'high',   note: 'Official hourly metered data' };
+  // Grid-operator data, but some cross-border flows are under-counted and annual
+  // totals miss generators (docs/TRADE_AUDIT.md, public/data/methodology.md).
+  if (s.includes('entso-e'))                      return { short: 'ENTSO-E',          rel: 'low',    note: 'Metered grid-operator data; some cross-border flows are under-counted (audit in progress)' };
   if (s.includes('eapp'))                         return { short: 'EAPP Secretariat', rel: 'high',   note: 'Official annual interconnection statistics' };
   if (s.includes('teias') || s.includes('epias')) return { short: 'TEIAS/EPIAS',      rel: 'high',   note: 'Official Turkish TSO data' };
-  if (s.includes('owid') || s.includes('ember'))  return { short: 'OWID/Ember',       rel: 'medium', note: 'Cross-validated estimates; small countries may be approximate' };
+  // OWID's strings also name Ember, so they are matched first.
+  if (s.includes('owid') || s.includes('our world in data')) return { short: 'OWID/Ember', rel: 'medium', note: 'Cross-validated estimates; small countries may be approximate' };
+  if (s.includes('ember'))                        return { short: 'Ember',            rel: 'high',   note: 'National statistics compiled by Ember; small countries may be approximate' };
   if (s.includes('comtrade'))                     return { short: 'Comtrade HS 2716', rel: 'medium', note: 'Customs declarations, not metered flows — volumes are largely UN-estimated from declared values, and a year with no declaration reads as zero rather than as missing' };
   if (s.includes('wdi') || s.includes('world bank')) return { short: 'WB WDI',        rel: 'medium', note: 'Derived from per-capita electricity use × population' };
   if (s.includes('grid review') || s.includes('status review')) return { short: 'Grid review', rel: 'low', note: 'Desk review of national grid documentation; no bilateral time series' };

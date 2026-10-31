@@ -28,14 +28,25 @@ const SOURCES = [
     category: 'Generation & Trade Statistics',
     rows: [
       {
-        layer:   'Generation mix · installed capacity · cross-border flows',
+        layer:   'Generation mix · installed capacity · demand',
+        source:  'Ember — Yearly Electricity Data',
+        abbr:    'Ember',
+        version: 'Yearly release',
+        updated: '2024–2025',
+        freq:    'Annual',
+        coverage:'Most countries; the reference every country\'s series is checked against',
+        quality: 'Good — harmonised from national statistics. Small island states may be approximate.',
+        url:     'https://ember-energy.org/data/yearly-electricity-data/',
+      },
+      {
+        layer:   'Cross-border flows · fuel detail for the AI assistant',
         source:  'ENTSO-E Transparency Platform',
         abbr:    'ENTSO-E',
-        version: 'A75 / A68 / A11',
+        version: 'A11 / A75 / A68',
         updated: '2024–2025',
         freq:    'Annual / monthly',
-        coverage:'European countries (EU + neighbours)',
-        quality: 'Good — official TSO-reported data. Covers generation by fuel type, capacity, and bilateral trade flows.',
+        coverage:'European countries',
+        quality: 'Variable — metered TSO data. Trade flows are shown as reported. Annual generation and capacity totals often miss whole fuels (Norway\'s capacity was 11% of Ember\'s), so charts use Ember; ENTSO-E\'s finer split (reservoir vs run-of-river hydro, lignite vs hard coal, offshore wind) is kept for the AI assistant.',
         url:     'https://transparency.entsoe.eu',
       },
       {
@@ -100,13 +111,13 @@ const SOURCES = [
       },
       {
         layer:   'Plants · status (operating / construction / planned)',
-        source:  'Global Energy Monitor',
+        source:  'Global Energy Monitor — Global Integrated Power Tracker',
         abbr:    'GEM',
-        version: '2024–2025',
-        updated: '2024–2025',
+        version: '2026 release',
+        updated: '2026',
         freq:    'Semi-annual',
         coverage:'Global — fossil & RE trackers',
-        quality: 'Best for fossil fuels (unit-level). Actively maintained. Requires manual download.',
+        quality: 'Best for fossil fuels (unit-level). Actively maintained. Fetched by tools/prepare_gem.py.',
         url:     'https://globalenergymonitor.org',
       },
     ],
@@ -163,28 +174,40 @@ const SOURCES = [
     category: 'RE Resources',
     rows: [
       {
-        layer:   'Solar GHI · DNI · PVOUT · monthly profile',
+        layer:   'Solar GHI · DNI · PVOUT · PV capacity factor',
         source:  'Global Solar Atlas',
         abbr:    'Solar Atlas',
-        version: '—',
-        updated: 'Continuous',
-        freq:    'On demand (API)',
-        coverage:'Global',
-        quality: 'Good — established public dataset. Point query REST API.',
+        version: 'Country statistics',
+        updated: '2020',
+        freq:    'Ad hoc (tools/prepare_re.py)',
+        coverage:'Global up to 60°N',
+        quality: 'Good — official country statistics over every ~250 m cell: mean, median, best 10%.',
         anchor:  '#method-solar',
         url:     'https://globalsolaratlas.info',
       },
       {
-        layer:   'Wind speed 100m · monthly profile',
-        source:  'ERA5 via Open-Meteo',
-        abbr:    'ERA5 / Open-Meteo',
-        version: '2014–2023',
-        updated: '2024',
-        freq:    'On demand (API)',
+        layer:   'Wind speed · power density · capacity factor at 100 m',
+        source:  'Global Wind Atlas (DTU / ESMAP)',
+        abbr:    'Wind Atlas',
+        version: 'v4',
+        updated: '2025',
+        freq:    'Ad hoc (tools/prepare_re.py)',
         coverage:'Global',
-        quality: 'Good — ERA5 reanalysis, 0.25° resolution. Hellman correction to 100m applied.',
+        quality: 'Good — 250 m model, averaged over the World Bank country outline, weighted by area.',
         anchor:  '#method-wind',
-        url:     'https://open-meteo.com',
+        url:     'https://globalwindatlas.info',
+      },
+      {
+        layer:   'Monthly solar & wind profile',
+        source:  'NASA POWER climatology',
+        abbr:    'NASA POWER',
+        version: 'Climatology',
+        updated: '—',
+        freq:    'Ad hoc (tools/prepare_re.py)',
+        coverage:'Global',
+        quality: 'Variable — coarse (0.5–1°) cells at up to 12 points per country; only the seasonal shape is used.',
+        anchor:  '#method-wind',
+        url:     'https://power.larc.nasa.gov',
       },
       {
         layer:   'Electricity consumption per capita',
@@ -477,8 +500,8 @@ export default function AboutPage() {
             </p>
             <ol style={{ paddingLeft: 18, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <li style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.65 }}>
-                <strong style={{ color: t.lbl }}>National supply data file</strong> — per-country JSON with official figures
-                from ENTSO-E, national TSOs, Ember, or OWID. Each file indicates its source; the Load tab displays
+                <strong style={{ color: t.lbl }}>National supply data file</strong> — per-country JSON with figures
+                from Ember or, for a few countries, national statistics (TEİAŞ, SSC Azerbaijan, GSE Georgia, SIAT). Each file indicates its source; the Load tab displays
                 an <em>Official</em> or <em>Estimated</em> badge accordingly.
               </li>
               <li style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.65 }}>
@@ -527,59 +550,66 @@ export default function AboutPage() {
               Solar Irradiance Resources
             </h3>
             <p style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.7, marginBottom: 14, maxWidth: 660 }}>
-              The RE Resources tab shows solar potential using two complementary approaches:
-            </p>
-            <p style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.7, marginBottom: 10, maxWidth: 660 }}>
-              <strong style={{ color: t.lbl }}>Point query</strong> — a single coordinate query to the{' '}
+              The RE Resources tab shows each country&rsquo;s{' '}
               <a href="https://globalsolaratlas.info" target="_blank" rel="noopener noreferrer"
                 style={{ color: 'rgba(74,143,204,0.85)', textDecoration: 'none' }}>
-                Global Solar Atlas REST API
+                Global Solar Atlas
               </a>{' '}
-              (ESMAP / World Bank). Returns GHI, DNI, PVOUT, and a 12-month irradiance profile for the selected location.
+              (ESMAP / World Bank) country statistics: the mean, median and best 10% of every ~250 m cell
+              in the country, for GHI, DNI and PV output (PVOUT). They are published as daily totals and
+              shown as yearly ones; the PV capacity factor follows from PVOUT:
             </p>
-            <p style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.7, marginBottom: 14, maxWidth: 660 }}>
-              <strong style={{ color: t.lbl }}>Map grid overlay</strong> — fetched from the NASA POWER
-              climatology API at 1°×1° resolution. The raw value is the average daily irradiance
-              (kWh/m²/day); it is converted to an annual total:
-            </p>
-            <Formula t={t} label="Solar irradiance · annual GHI"
-              eq="GHI_annual [kWh/m²/yr] = daily_mean [kWh/m²/day] × 365"
+            <Formula t={t} label="Solar · annual totals and PV capacity factor"
+              eq={[
+                'GHI_annual [kWh/m²/yr] = GHI_daily × 365',
+                'PV CF [%] = PVOUT_daily [kWh/kWp] × 365 / 8760 × 100',
+              ]}
               note={[
-                'Parameter : ALLSKY_SFC_SW_DWN  (NASA POWER RE community)',
-                'Resolution: 1° × 1° grid cells  (~111 km at the equator)',
+                'Averages cover the whole country, not only land where a plant could be built.',
+                'The atlas stops at 60°N, so Finland and Iceland have no solar figures.',
               ]} />
             <p style={{ fontSize: '0.62rem', color: t.lblMuted, fontStyle: 'italic', lineHeight: 1.6 }}>
-              Grid values are long-term climatological means and do not reflect inter-annual variability.
-              For detailed site assessment, use the point query or dedicated solar resource tools.
+              The monthly GHI chart takes its seasonal shape from NASA POWER (see below) and is scaled
+              so that its average equals the atlas figure. For site assessment, use the atlas itself.
             </p>
           </div>
 
           {/* §3 Wind */}
           <div id="method-wind" style={{ marginBottom: 40 }}>
             <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: t.text, marginBottom: 6 }}>
-              Wind Speed at 100 m
+              Wind Resource at 100 m
             </h3>
             <p style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.7, marginBottom: 14, maxWidth: 660 }}>
-              Modern wind turbines typically have hub heights of 80–140 m. Wind speed increases with
-              altitude, so the 50 m data from NASA POWER must be corrected before comparing to turbine
-              specifications. The tool uses the <strong style={{ color: t.lbl }}>Hellman power law</strong>,
-              the standard engineering approximation for wind shear over open terrain:
+              Wind figures come from the{' '}
+              <a href="https://globalwindatlas.info" target="_blank" rel="noopener noreferrer"
+                style={{ color: 'rgba(74,143,204,0.85)', textDecoration: 'none' }}>
+                Global Wind Atlas
+              </a>{' '}
+              v4 (DTU / ESMAP) at 100 m above ground: mean wind speed, power density and the capacity factor
+              of an IEC class 2 turbine. Its country rasters are read at a reduced resolution (about 1–8 km
+              cells, depending on country size), clipped to the World Bank country outline, and averaged
+              with each cell weighted by its area:
             </p>
-            <Formula t={t} label="Wind shear · Hellman power law"
-              eq={[
-                'v₁₀₀ = v₅₀ × (100 / 50)^α',
-                '     = v₅₀ × 2^0.143',
-                '     ≈ v₅₀ × 1.082',
-              ]}
+            <Formula t={t} label="Wind · area-weighted country average"
+              eq="mean = Σ (value × cos latitude) / Σ cos latitude   over cells inside the outline"
               note={[
-                'v₅₀ = NASA POWER WS50M  (wind speed at 50m AGL, climatological mean)',
-                'α   = 0.143  (Hellman exponent for open terrain, IEC standard)',
-                'Grid : 0.5° × 0.5° cells  (~55 km at the equator)',
+                'Best 10% = the value the windiest tenth of the country reaches or exceeds.',
+                'Capacity factor is modelled for one turbine type everywhere; real fleets usually run lower.',
               ]} />
+            <p style={{ fontSize: '0.72rem', color: t.muted, lineHeight: 1.7, marginBottom: 14, maxWidth: 660 }}>
+              <strong style={{ color: t.lbl }}>Monthly profiles</strong> — the seasonal shape of solar and
+              wind comes from the{' '}
+              <a href="https://power.larc.nasa.gov" target="_blank" rel="noopener noreferrer"
+                style={{ color: 'rgba(74,143,204,0.85)', textDecoration: 'none' }}>
+                NASA POWER
+              </a>{' '}
+              climatology (ALLSKY_SFC_SW_DWN and WS50M) at up to 12 points spread over the country.
+              Only the shape is kept: each profile is scaled so that its average equals the atlas figure.
+            </p>
             <p style={{ fontSize: '0.62rem', color: t.lblMuted, fontStyle: 'italic', lineHeight: 1.6 }}>
-              The Hellman exponent α = 0.143 assumes flat, open terrain. In practice α varies with
-              surface roughness: lower over water (~0.10), higher in forested or urban areas (~0.25–0.40).
-              Results should be treated as a regional screening tool, not a site-specific wind assessment.
+              All figures are computed ahead of time by tools/prepare_re.py, so the tab makes no request
+              outside the explorer. They are long-term averages and change only when the atlases publish
+              new versions.
             </p>
           </div>
 
@@ -649,7 +679,7 @@ export default function AboutPage() {
         {/* Footer */}
         <p style={{ fontSize: '0.55rem', color: t.lblMuted, marginTop: 32, lineHeight: 1.7 }}>
           Regional Power Explorer · Pilot · Indicative data · partly AI-generated · unofficial ·{' '}
-          Data licences: OSM (ODbL), GPPD (CC BY 4.0), GEM (CC BY 4.0), World Bank Official Boundaries (CC BY 4.0)
+          Data licences: OSM (ODbL), GPPD (CC BY 4.0), GEM (CC BY 4.0), Global Solar Atlas (CC BY 4.0), Global Wind Atlas (CC BY 4.0), NASA POWER (free use, credit requested), World Bank Official Boundaries (CC BY 4.0)
         </p>
       </div>
     </div>

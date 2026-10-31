@@ -1,0 +1,1 @@
+{"1":{"zones":{"SSD_1":{"mw":82.9,"plants":10,"byFuelMw":{"diesel":30.0,"solar":52.9}}},"links":[]},"2":{"zones":{"SSD_1":{"mw":82.9,"plants":10,"byFuelMw":{"diesel":30.0,"solar":52.9}},"SSD_2":{"mw":0.0,"plants":0,"byFuelMw":{}}},"links":[["SSD_1","SSD_2"]]}}

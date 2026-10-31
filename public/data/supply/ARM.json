@@ -1,9 +1,8 @@
 {
   "country": "Armenia",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Hydro = all hydropower (reservoir + run-of-river not distinguished in OWID). Demand = generation + net imports (OWID electricity_generation + net_elec_imports).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,24 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
+      "Gas": [
+        2800.0,
+        2580.0,
+        2870.0,
+        3380.0,
+        3050.0,
+        3170.0,
+        3380.0,
+        3880.0,
+        3720.0,
+        3520.0,
+        3310.0
+      ],
       "Nuclear": [
         2570.0,
         2190.0,
@@ -25,7 +39,9 @@
         2550.0,
         1850.0,
         2630.0,
-        2510.0
+        2510.0,
+        2630.0,
+        2680.0
       ],
       "Hydro": [
         2180.0,
@@ -36,18 +52,9 @@
         1780.0,
         2200.0,
         2850.0,
-        1650.0
-      ],
-      "Gas": [
-        2800.0,
-        2580.0,
-        2870.0,
-        3380.0,
-        3050.0,
-        3170.0,
-        3380.0,
-        3880.0,
-        3720.0
+        1650.0,
+        2000.0,
+        1900.0
       ],
       "Solar": [
         0.0,
@@ -58,9 +65,12 @@
         140.0,
         290.0,
         520.0,
-        770.0
+        770.0,
+        880.0,
+        730.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       6300.0,
       6150.0,
@@ -70,7 +80,9 @@
       6630.0,
       7090.0,
       8430.0,
-      7510.0
+      7510.0,
+      7640.0,
+      7030.0
     ]
   },
   "capacity": {
@@ -85,7 +97,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Gas": [
@@ -95,6 +109,8 @@
         1570.0,
         1570.0,
         1570.0,
+        1830.0,
+        1830.0,
         1830.0,
         1830.0,
         1830.0
@@ -108,6 +124,8 @@
         410.0,
         450.0,
         450.0,
+        450.0,
+        450.0,
         450.0
       ],
       "Hydro": [
@@ -119,7 +137,9 @@
         1350.0,
         1350.0,
         1350.0,
-        1360.0
+        1360.0,
+        1350.0,
+        1340.0
       ],
       "Solar": [
         0.0,
@@ -130,29 +150,9 @@
         50.0,
         150.0,
         240.0,
-        400.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Bioenergy": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        400.0,
+        490.0,
+        710.0
       ]
     }
   }

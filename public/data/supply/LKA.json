@@ -1,9 +1,8 @@
 {
   "country": "Sri Lanka",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Coal": [
@@ -25,7 +26,22 @@
         6360.0,
         6110.0,
         5730.0,
-        5150.0
+        5150.0,
+        5560.0,
+        4620.0
+      ],
+      "Oil & Other Fossil": [
+        2310.0,
+        4520.0,
+        5150.0,
+        3720.0,
+        5120.0,
+        4270.0,
+        2750.0,
+        2590.0,
+        3280.0,
+        2010.0,
+        1810.0
       ],
       "Hydro": [
         6000.0,
@@ -36,7 +52,9 @@
         4980.0,
         7230.0,
         6770.0,
-        5980.0
+        5980.0,
+        7010.0,
+        6590.0
       ],
       "Solar": [
         40.0,
@@ -47,7 +65,9 @@
         460.0,
         640.0,
         840.0,
-        1000.0
+        1000.0,
+        1370.0,
+        3030.0
       ],
       "Wind": [
         340.0,
@@ -58,18 +78,9 @@
         330.0,
         650.0,
         740.0,
-        820.0
-      ],
-      "Oil": [
-        2310.0,
-        4520.0,
-        5150.0,
-        3720.0,
-        5120.0,
-        4270.0,
-        2750.0,
-        2590.0,
-        3280.0
+        820.0,
+        870.0,
+        930.0
       ],
       "Bioenergy": [
         60.0,
@@ -80,20 +91,25 @@
         100.0,
         90.0,
         50.0,
-        120.0
+        120.0,
+        200.0,
+        230.0
       ],
       "Other Renewables": [
-        60.0,
-        70.0,
-        70.0,
-        90.0,
-        120.0,
-        100.0,
-        130.0,
-        80.0,
-        160.0
+        null,
+        null,
+        null,
+        null,
+        null,
+        0.0,
+        40.0,
+        30.0,
+        40.0,
+        40.0,
+        40.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       13210.0,
       14310.0,
@@ -103,7 +119,9 @@
       16500.0,
       17510.0,
       16750.0,
-      16390.0
+      16390.0,
+      17060.0,
+      17250.0
     ]
   },
   "capacity": {
@@ -118,7 +136,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Coal": [
@@ -130,9 +150,13 @@
         900.0,
         900.0,
         900.0,
+        900.0,
+        900.0,
         900.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
+        490.0,
+        490.0,
         490.0,
         490.0,
         490.0,
@@ -152,7 +176,9 @@
         1800.0,
         1800.0,
         1830.0,
-        1840.0
+        1850.0,
+        1970.0,
+        1970.0
       ],
       "Solar": [
         40.0,
@@ -163,7 +189,9 @@
         440.0,
         620.0,
         800.0,
-        960.0
+        960.0,
+        1580.0,
+        2510.0
       ],
       "Wind": [
         130.0,
@@ -174,6 +202,8 @@
         180.0,
         250.0,
         250.0,
+        270.0,
+        270.0,
         270.0
       ],
       "Bioenergy": [
@@ -185,18 +215,9 @@
         40.0,
         40.0,
         40.0,
+        40.0,
+        40.0,
         40.0
-      ],
-      "Other Renewables": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        0.0,
-        0.0,
-        0.0,
-        0.0
       ]
     }
   }

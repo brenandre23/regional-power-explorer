@@ -1,9 +1,8 @@
 {
   "country": "Trinidad and Tobago",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         9180.0,
         9220.0,
         9450.0,
-        9470.0
+        9470.0,
+        9500.0
+      ],
+      "Oil & Other Fossil": [
+        20.0,
+        30.0,
+        30.0,
+        30.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
       ],
       "Solar": [
         10.0,
@@ -36,20 +49,11 @@
         10.0,
         10.0,
         10.0,
+        10.0,
         10.0
-      ],
-      "Oil": [
-        20.0,
-        30.0,
-        30.0,
-        30.0,
-        40.0,
-        40.0,
-        40.0,
-        40.0,
-        40.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       9570.0,
       9420.0,
@@ -59,7 +63,8 @@
       9230.0,
       9270.0,
       9500.0,
-      9520.0
+      9520.0,
+      9550.0
     ]
   },
   "capacity": {
@@ -74,7 +79,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -86,51 +92,8 @@
         2060.0,
         2060.0,
         2060.0,
+        2060.0,
         2060.0
-      ],
-      "Other Fossil": [
-        20.0,
-        20.0,
-        20.0,
-        20.0,
-        20.0,
-        20.0,
-        20.0,
-        20.0,
-        20.0
-      ],
-      "Solar": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Wind": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Bioenergy": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
       ]
     }
   }

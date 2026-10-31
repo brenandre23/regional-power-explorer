@@ -1,9 +1,8 @@
 {
   "country": "Iraq",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -25,7 +25,20 @@
         71510.0,
         70870.0,
         90240.0,
-        75680.0
+        75680.0,
+        79300.0
+      ],
+      "Oil & Other Fossil": [
+        46960.0,
+        57610.0,
+        57590.0,
+        43080.0,
+        43750.0,
+        41070.0,
+        45860.0,
+        40590.0,
+        67570.0,
+        68000.0
       ],
       "Hydro": [
         2550.0,
@@ -36,7 +49,8 @@
         4160.0,
         3350.0,
         2650.0,
-        1380.0
+        1380.0,
+        2000.0
       ],
       "Solar": [
         60.0,
@@ -47,20 +61,11 @@
         380.0,
         380.0,
         380.0,
-        380.0
-      ],
-      "Oil": [
-        46960.0,
-        57610.0,
-        57590.0,
-        43080.0,
-        43750.0,
-        41070.0,
-        45860.0,
-        40590.0,
-        67570.0
+        380.0,
+        430.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       79810.0,
       90070.0,
@@ -70,7 +75,8 @@
       124570.0,
       125560.0,
       137390.0,
-      151830.0
+      151830.0,
+      156830.0
     ]
   },
   "capacity": {
@@ -85,30 +91,33 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
-        15090.0,
-        17650.0,
-        20080.0,
-        20330.0,
-        21670.0,
-        25970.0,
-        27510.0,
-        32560.0,
-        34030.0
+        14680.0,
+        16740.0,
+        19170.0,
+        19430.0,
+        20770.0,
+        25070.0,
+        26610.0,
+        32160.0,
+        33370.0,
+        34620.0
       ],
-      "Other Fossil": [
-        10930.0,
-        10930.0,
-        10930.0,
-        10930.0,
-        10990.0,
-        11290.0,
-        11290.0,
-        11290.0,
-        12120.0
+      "Oil & Other Fossil": [
+        8200.0,
+        8200.0,
+        8200.0,
+        8200.0,
+        8260.0,
+        8560.0,
+        8560.0,
+        8560.0,
+        10020.0,
+        10020.0
       ],
       "Hydro": [
         2270.0,
@@ -119,9 +128,11 @@
         1560.0,
         1560.0,
         1560.0,
+        1560.0,
         1560.0
       ],
       "Solar": [
+        40.0,
         40.0,
         40.0,
         40.0,

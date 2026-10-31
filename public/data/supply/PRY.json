@@ -1,9 +1,8 @@
 {
   "country": "Paraguay",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,7 +12,9 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024,
+      2025
     ],
     "fuels": {
       "Hydro": [
@@ -25,7 +26,9 @@
         46370.0,
         40570.0,
         43870.0,
-        52800.0
+        52800.0,
+        42170.0,
+        45110.0
       ],
       "Bioenergy": [
         150.0,
@@ -36,20 +39,12 @@
         260.0,
         270.0,
         240.0,
-        240.0
-      ],
-      "Other Renewables": [
-        150.0,
-        170.0,
-        140.0,
-        130.0,
-        140.0,
-        260.0,
-        270.0,
+        240.0,
         240.0,
         240.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       14760.0,
       15520.0,
@@ -59,7 +54,67 @@
       18630.0,
       19120.0,
       20160.0,
-      22650.0
+      22650.0,
+      26410.0,
+      29650.0
     ]
+  },
+  "capacity": {
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
+    "unit": "MW",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "fuels": {
+      "Oil & Other Fossil": [
+        10.0,
+        0.0,
+        0.0,
+        0.0,
+        30.0,
+        30.0,
+        30.0,
+        30.0,
+        30.0,
+        30.0,
+        30.0
+      ],
+      "Hydro": [
+        8800.0,
+        8800.0,
+        8800.0,
+        8800.0,
+        8820.0,
+        8820.0,
+        8820.0,
+        8820.0,
+        8820.0,
+        8820.0,
+        8820.0
+      ],
+      "Bioenergy": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+      ]
+    }
   }
 }

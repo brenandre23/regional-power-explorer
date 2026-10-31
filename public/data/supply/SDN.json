@@ -1,9 +1,8 @@
 {
   "country": "Sudan",
   "generation": {
-    "source": "Our World in Data / Ember — Yearly Electricity Data (github.com/owid/energy-data, CC BY 4.0)",
+    "source": "Ember — Yearly Electricity Data (ember-energy.org, CC BY 4.0)",
     "unit": "GWh",
-    "note": "Values converted from TWh (OWID) to GWh. Demand = electricity_demand column (includes net imports). Hydro = all hydropower (reservoir + run-of-river not distinguished).",
     "years": [
       2015,
       2016,
@@ -13,9 +12,22 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
+      "Oil & Other Fossil": [
+        4630.0,
+        6380.0,
+        6200.0,
+        6600.0,
+        5880.0,
+        6050.0,
+        6610.0,
+        4740.0,
+        2760.0,
+        3000.0
+      ],
       "Hydro": [
         8340.0,
         8050.0,
@@ -25,6 +37,7 @@
         11010.0,
         10950.0,
         11800.0,
+        11500.0,
         11500.0
       ],
       "Solar": [
@@ -36,18 +49,8 @@
         30.0,
         30.0,
         130.0,
-        140.0
-      ],
-      "Oil": [
-        4630.0,
-        6380.0,
-        6200.0,
-        6600.0,
-        5880.0,
-        6050.0,
-        6610.0,
-        4740.0,
-        2760.0
+        140.0,
+        160.0
       ],
       "Bioenergy": [
         110.0,
@@ -58,20 +61,11 @@
         110.0,
         110.0,
         110.0,
-        110.0
-      ],
-      "Other Renewables": [
-        110.0,
-        120.0,
-        130.0,
-        120.0,
-        110.0,
-        110.0,
-        110.0,
         110.0,
         110.0
       ]
     },
+    "note": "Values converted from TWh (Ember) to GWh. Demand = Ember electricity demand (generation plus net imports). A fuel Ember does not report for a year is left empty, not 0.",
     "demand": [
       13220.0,
       15010.0,
@@ -81,7 +75,8 @@
       17930.0,
       18630.0,
       17660.0,
-      15160.0
+      15160.0,
+      15570.0
     ]
   },
   "capacity": {
@@ -96,7 +91,8 @@
       2020,
       2021,
       2022,
-      2023
+      2023,
+      2024
     ],
     "fuels": {
       "Gas": [
@@ -108,12 +104,14 @@
         810.0,
         810.0,
         810.0,
+        810.0,
         810.0
       ],
-      "Other Fossil": [
+      "Oil & Other Fossil": [
         690.0,
         1190.0,
         1190.0,
+        1340.0,
         1340.0,
         1340.0,
         1340.0,
@@ -130,6 +128,7 @@
         1480.0,
         1480.0,
         1480.0,
+        1480.0,
         1480.0
       ],
       "Solar": [
@@ -141,9 +140,11 @@
         120.0,
         140.0,
         190.0,
+        190.0,
         190.0
       ],
       "Bioenergy": [
+        200.0,
         200.0,
         200.0,
         200.0,
